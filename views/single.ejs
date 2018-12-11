@@ -1,0 +1,435 @@
+  <script type="text/javascript" src="javascript/jquery.min.js"></script>
+  <script type="text/javascript" src="javascript/modernizr.js"></script>
+  <script type="text/javascript" src="javascript/bootstrap.min.js"></script>
+  <script type="text/javascript" src="javascript/StackBlur.js"></script>
+  <script>
+          $("document").ready(function(){
+            //animation.init();
+            $("#heading").children().css("opacity","1");
+            $("#upload-audio-image").mouseover(function(){
+                $("#audio-message").slideToggle(200);
+            });
+            $("#upload-audio-image").mouseout(function(){
+                $("#audio-message").slideToggle(200);
+            });
+            $("#upload-video-image").mouseover(function(){
+                $("#video-message").slideToggle(200);
+            });
+            $("#upload-video-image").mouseout(function(){
+                $("#video-message").slideToggle(200);
+            });
+
+            function checkLoginUsername() {
+                var user=$("#login-username").val();
+                if(validateLoginUser(user)){
+                  $.ajax({
+                        async: true,
+                        type: 'GET',
+                        url: '/login-user-validator?username='+user,
+                        success: function(data){
+                          if(data!=="false"){
+                            if(data.slice(0,9)==="./uploads"){
+                              data=data.substr(9);
+                              $("#user-login-image").hide(0,function(){
+                                    $("#display-image").show(0,function(){
+                                        $("#display-image").css({"background":`url("${data}") no-repeat center`,"background-size":"cover","filter":" hue-rotate(0deg) sepia(60%) grayscale(20%)"});
+                                    });
+                              });
+                            }else{
+                              $("#user-login-image").hide(0,function(){
+                                    $("#display-image").show(0,function(){
+                                        $("#display-image").css({"background":`url("${data}") no-repeat center`,"background-size":"cover","filter":" hue-rotate(0deg) sepia(60%) grayscale(20%)"});
+                                    });
+                              });
+                            }
+                          }else{
+                            $("#user-login-image").show(0,function(){
+                                    $("#display-image").hide(0);
+                            });
+                          }
+                        }
+                    });
+                }else{
+                    console.log("check reg exp");
+                }
+            }
+            function checkLoginPassword() {
+                var password=$("#login-password").val();
+                if(validatePassword(password)){
+
+                }else{
+
+                }
+            }
+            function checkEmail() {
+                var email=$("#email").val();
+                if(validateEmail(email)){
+                  $.ajax({
+                        async: true,
+                        type: 'GET',
+                        url: '/email-validator?email='+email,
+                        success: function(data){
+                            if(data==="true"){
+                              $("#editor").html(email+'<span class="glyphicon">&#xe084;</span>');
+                              $("#editor").css("text-decoration","none");
+                            }else{
+                              $("#editor").html(email);
+                              $("#editor").css("text-decoration","line-through");
+                            }
+                        }
+                    });
+                }else{
+                  $("#editor").html(email);
+                  $("#editor").css("text-decoration","line-through");
+                }
+            }
+            function checkUser() {
+                var user=$("#username").val();
+                if(validateUser(user)){
+                  $.ajax({
+                        async: true,
+                        type: 'GET',
+                        url: '/user-validator?username='+user,
+                        success: function(data){
+                            if(data==="true"){
+                              $("#editor_user").html(user+'<span class="glyphicon">&#xe084;</span>');
+                              $("#editor_user").css("text-decoration","none");
+                            }else{
+                              $("#editor_user").html(user);
+                              $("#editor_user").css("text-decoration","line-through");
+                            }
+                        }
+                    });
+                }else{
+                  $("#editor_user").html(user);
+                  $("#editor_user").css("text-decoration","line-through");
+                }
+            }
+            function checkPassword() {
+                var password=$("#password").val();
+                if(validatePassword(password)){
+                  $("#editor_password").html("password"+'<span class="glyphicon">&#xe084;</span>');
+                  $("#editor_password").css("text-decoration","none");
+                }else{
+                  $("#editor_password").html("password");
+                  $("#editor_password").css("text-decoration","line-through");
+                }
+            }
+            function validateLoginUser(username){
+                var re=/^([A-Za-z0-9_\@\.]{4,70})$/;
+                return re.test(String(username).toLowerCase());
+            }
+            function validateEmail(email) {
+                var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return re.test(String(email).toLowerCase());
+            }
+            function validateUser(username) {
+                var re = /^[A-Za-z0-9_]{4,20}$/;
+                return re.test(String(username).toLowerCase());
+            }
+            function validatePassword(password) {
+                var re = /^[A-Za-z0-9_]{4,20}$/;
+                return re.test(String(password).toLowerCase());
+            }
+            function sign_up_image_manipulation(){
+              $("#user_imagery").change(function(){
+                    if(this.files && this.files[0]){
+                      /* /\.(jpe?g|png|gif)$/i */
+                      if (/^image/.test(this.files[0].type) ) {
+                            var image_reader=new FileReader();
+                            image_reader.onload=function(e){
+                                $(".lonely").css({"background":`url("${e.target.result}") no-repeat center`,"background-size":"cover","filter":" hue-rotate(0deg) sepia(60%) grayscale(20%)"});
+                                $("#user_image").css({"filter":"blur(0px)"});
+                            }
+                            image_reader.readAsDataURL(this.files[0]);
+                          }
+                      }else{
+                        console.log("Enter image only");
+                      }
+              });
+            }
+
+            $(".single-header-body-artwork").css({"background": `url("<%=locals.data2.album_artwork_path%>") no-repeat center`,"opacity":"1","background-size":"cover","filter":" hue-rotate(0deg) sepia(30%) grayscale(20%)"});
+            window.Audio._bagTwerk(`#heading`,`music_cover`,`candy`,"single");
+            //$("#heading").css({"background": `url("<%=locals.data2.album_artwork_path%>") no-repeat center`,"opacity":"1","background-size":"cover","filter":" hue-rotate(0deg) sepia(30%) grayscale(20%)"});
+            /*$.ajax({
+              async: true,
+              type:'GET',
+              url: '/swatch-color?path=./uploads<%=locals.data2.album_artwork_path%>',
+              success:function(data){
+                $("#heading").css({"background-image": `linear-gradient(rgba(2,17,10,.5), rgba(140,20,0,0.5)), linear-gradient(to top right,rgb(${data[0].r},${data[0].g},${data[0].b}),rgb(${data[1].r},${data[1].g},${data[1].b})) no-repeat `,"opacity":"1","background-size":"cover"});
+
+              },
+              error: function(data){
+                  console.log(data);
+              }
+            });
+              */
+            $("#user_image").click(function(evt){
+                evt.preventDefault();
+                $("#user_imagery").click();
+            });
+            var company="";
+            $("#individual").click(function(){
+              document.getElementById("business").checked=false;
+              company="individual";
+            });
+            $("#business").click(function(){
+              document.getElementById("individual").checked=false;
+                company="business";
+            });
+            $("#create-account").attr('disabled','disabled');
+            $('#check-agreement').change(function () {
+                if($(this).is(":checked")){
+                    $("#create-account").removeAttr("disabled");
+                }else{
+                    $("#create-account").attr('disabled','disabled');
+                }
+            });
+            sign_up_image_manipulation();
+            $(".sign-up-form").on("submit",function(event){
+                  event.preventDefault();
+                  var email=$("#email").val();
+                  var username=$("#username").val();
+                  var password=$("#password").val();
+                  var comp=company;
+                  if(validateUser(username) && validateEmail(email) && validatePassword(password) && comp!==""){
+                      var lead=this;
+                      $.ajax({
+                        async: true,
+                        type:'POST',
+                        url: '/sign-up',
+                        data:new FormData(this),
+                        xhr: function () {
+                            var xhr = new window.XMLHttpRequest();
+                            xhr.upload.addEventListener("progress", function (evt) {
+                                if (evt.lengthComputable) {
+                                      var percentComplete = evt.loaded / evt.total;
+                                      console.log(percentComplete);
+                                }
+                            }, false);
+                            xhr.addEventListener("progress", function (evt) {
+                                if (evt.lengthComputable) {
+                                    var percentComplete = evt.loaded / evt.total;
+                                    console.log(percentComplete);
+                                }
+                            }, false);
+                            return xhr;
+                        },
+                        cache:false,
+                        contentType: false,
+                        processData: false,
+                        success:function(data){
+                          $("#global-error").html("");
+                          $("#editor").html("");
+                          $("#editor_user").html("");
+                          $("#editor_password").html("");
+                          $("#console").html("");
+                            data.forEach(function(mssg){
+                              if(mssg=="Done!"){
+                                $("#sign-in").trigger("click");
+                              }
+                              $("#global-error").append(mssg+"<br/>");
+                            });
+                        },
+                        error: function(data){
+                            console.log(data);
+                        }
+                      });
+                  }else{
+                    $("#console").html("Enter the correct information");
+                    $("#console").css("text-decoration","none");
+                  }
+              });
+            $("#login").on("submit",function(event){
+                  event.preventDefault();
+                  var username=$("#login-username").val();
+                  var password=$("#login-password").val();
+                  if(validateLoginUser(username) && validatePassword(password)){
+                    var lead=this;
+                    var loginData={"login-username": username, "login-password": password};
+                    $.ajax({
+                         async: true,
+                         type : 'POST',
+                         url : '/sign-in',
+                         data : loginData,
+                         xhr: function () {
+                             var xhr = new window.XMLHttpRequest();
+                             xhr.upload.addEventListener("progress", function (evt) {
+                                 if (evt.lengthComputable) {
+                                       var percentComplete = evt.loaded / evt.total;
+                                       console.log(percentComplete);
+                                       $("#ruler").css("width",`${percentComplete}%`);
+                                 }
+                             }, false);
+                             xhr.addEventListener("progress", function (evt) {
+                                 if (evt.lengthComputable) {
+                                     var percentComplete = evt.loaded / evt.total;
+                                     $("#ruler").css("width",`${percentComplete}%`);
+                                     console.log(percentComplete);
+                                 }
+                             }, false);
+                             return xhr;
+                         },
+                         success: function(data){
+                          if(data=="error"){
+                              console.log("Not a user");
+                          }else{
+                              window.location.replace("/media");
+                          }
+                         }
+                     });
+                  }else{
+                    //display error message
+                  }
+            });
+            <%if(user){%>
+                var image='<%=user.profile_image%>';
+                $("#side-nav-link-list").show();
+                if(image.slice(0,9)==="./uploads"){
+                    image=image.substr(9);
+                    $("#profile-image").css({"background":`url("${image}") no-repeat center`,"background-size":"cover","filter":" hue-rotate(0deg) sepia(60%) grayscale(20%)"});
+                }else{
+                    $("#profile-image").css({"background":`url("${image}") no-repeat center`,"background-size":"cover","filter":" hue-rotate(0deg) sepia(60%) grayscale(20%)"});
+                }
+                $("#profile-image-link").attr("href",`/<%=user.username%>`);
+                $("#logout-button").on("click",function(event){
+                      event.preventDefault();
+                      $.ajax({
+                           type : 'GET',
+                           url : '/sign-out',
+                           xhr: function () {
+                                    var xhr = $.ajaxSettings.xhr();
+                                    xhr.onprogress = function e() {
+                                        // For downloads
+                                        if (e.lengthComputable) {
+                                            var percentComplete=e.loaded / e.total;
+                                            $("#ruler").css("width",`${percentComplete}%`);
+                                        }
+                                    };
+                                    xhr.upload.onprogress = function (e) {
+                                        // For uploads
+                                        if (e.lengthComputable) {
+                                          var percentComplete=e.loaded / e.total;
+                                          $("#ruler").css("width",`${percentComplete}%`);
+                                        }
+                                    };
+                                    return xhr;
+                              },
+                           success: function(data){
+                            window.location.replace("/media");
+                           }
+                       });
+                });
+            <%}%>
+              var email_timer = null;
+              $('#email').keydown(function(){
+                     clearTimeout(email_timer);
+                     email_timer = setTimeout(checkEmail, 1000)
+              });
+              var username_timer = null;
+              $('#username').keydown(function(){
+                     clearTimeout(username_timer);
+                     username_timer = setTimeout(checkUser, 1000)
+              });
+              var password_timer = null;
+              $('#password').keydown(function(){
+                     clearTimeout(password_timer);
+                     password_timer = setTimeout(checkPassword, 1000)
+              });
+              var login_password_timer = null;
+              $('#login-password').keydown(function(){
+                     clearTimeout(login_password_timer);
+                     login_password_timer = setTimeout(checkLoginPassword, 1000)
+              });
+              var login_username_timer = null;
+              $('#login-username').keydown(function(){
+                     clearTimeout(login_username_timer);
+                     login_username_timer = setTimeout(checkLoginUsername, 1000)
+              });
+          });
+  </script>
+  <div id="heading" class="preload-anime heading" >
+    <% include header.ejs%>
+    <div id="single-body9">
+        <div class="body9" style="display:none">
+              <div id="upload-audio-button">
+                    <div id="audio-message">Upload audio content</div>
+                    <a href="/upload?data=audio" class="link"><img src="header/images/sound-waves_.png" alt="Audio Upload Image" width="150" height="150" id="upload-audio-image" class="upload-audio-image"/></a>
+              </div>
+              <div id="upload-video-button">
+                   <div id="video-message">Upload video content</div>
+                    <a href="/upload?data=video" class="link"><img src="header/images/Video-Upload-Button.png" alt="Video Upload Image" width="150" height="150" id="upload-video-image" class="upload-video-image"/></a>
+              </div>
+        </div>
+        <div class="sign-up-div">
+              <div class="alone">
+                    <form class="sign-up-form" method="post" action="/sign-up" enctype="multipart/form-data">
+                      <input hidden="true" type="file" id="user_imagery" name="artwork"/>
+                        <div id="trek">
+                          <div class="lonely">
+                                    <img src="header/images/video-camera (2).svg" id="user_image" alt="avatar" width="100" height="100"/><br/><br/><br/>
+                                    <p id="global-error">
+                                        <p id="editor"></p>
+                                        <p id="editor_user"></p>
+                                        <p id="editor_password"></p>
+                                        <p id="console">
+                                        </p>
+                                    </p>
+                          </div>
+                          <div class="form-fills">
+                                <input type="email" id="email" name="email" placeholder="Email"/><br/>
+                                <div id="type">
+                                  <label class="no-name">Individual </label> <input type="radio" id="individual" name="individual"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                  &nbsp;&nbsp;
+                                  <label class="no-name">Business </label>  <input type="radio" id="business" name="business">
+                                </div>
+                                <input type="text" id="username" name="username" placeholder="Username"/><br/>
+                                <input type="password" id="password" name="password" placeholder="Password"/><br/>
+                                <div id="checker">
+                                        <input type="checkbox" id="check-agreement" name="check-agreement"/> <label class="no-name">check to accept <a href="#">Terms and Conditions</a></label>
+                                </div>
+                                <input type="submit" id="create-account" value="Create Account"/>
+                          </div>
+                        </div>
+                    </form>
+              </div>
+          </div>
+        <div class="sign-in-div">
+              <div class="users-to-log">
+                    <div id="position-div">
+                      <form id="login" method="post" action='/sign-in' name="login">
+                          <div id="user-avatar">
+                                <img src="header/images/user.svg" alt="user" id="user-login-image" width="100" height="100"/>
+                                <div id="display-image"></div>
+                          </div>
+                          <input type="text" name="login-username" id="login-username" placeholder="Username or Email"/><br/>
+                          <input type="password" name="login-password" id="login-password" placeholder="Password"/><br/>
+                          <a href="#" id="forgotten-password">forgot password?</a><br/>
+                          <button id="login-button" >Sign in</button>
+                      </form>
+                    </div>
+              </div>
+        </div>
+        <div class="single-header">
+            <div class="single-header-body">
+              <div class="single-header-body-artwork">
+              </div>
+              <div class="single-header-body-view">
+                    <div class="play_butt_side">dklfd</div>
+                    <div class="waveform_side">djkfld</div>
+              </div>
+            </div>
+        </div>
+    </div>
+  </div>
+    <hr id="ruler"/>
+  <section class="content">
+    <div id="load-playlist">
+      <% include playlist.ejs%>
+    </div>
+  </section>
+  <div id="blury" style="display:none" >
+      <div id="candy" width="100" height="100"></div>
+      <img src="<%=locals.data2.album_artwork_path%>" id="music_cover"/>
+  </div>

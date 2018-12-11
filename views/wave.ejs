@@ -1,0 +1,1074 @@
+<script>
+  function bagTwerk(id,music_cover,can,type){
+      if(type=="profile"){
+        var canvas=document.createElement("canvas");
+        canvas.id="candle";
+        var imager=document.getElementById(music_cover);
+        canvas.width=imager.width;
+        canvas.height=imager.height;
+        document.getElementById(can).appendChild(canvas);
+        var ctx=document.getElementById("candle").getContext("2d");
+        ctx.drawImage(imager,0,0,canvas.width,canvas.height);
+        var top_x=0;
+        var top_y=0;
+        var width=canvas.width;
+        var height=canvas.height;
+        var radius=0.1;
+        stackBlurCanvasRGB( canvas.id, top_x, top_y, width, height, radius );
+        var bg_image=new Image();
+        bg_image.src=canvas.toDataURL();
+        $(id).css({"background-image":"url("+bg_image.src+")","background-position": "center","background-position-x": "center","background-position-y": "center","background-size": "cover"});
+        $("#"+can).remove();
+        $("#"+music_cover).remove();
+      }else if(type=="single"){
+        var canvas=document.createElement("canvas");
+        canvas.id="candle";
+        var imager=document.getElementById(music_cover);
+        canvas.width=imager.width;
+        canvas.height=imager.height;
+        document.getElementById(can).appendChild(canvas);
+        var ctx=document.getElementById("candle").getContext("2d");
+        ctx.drawImage(imager,0,0,canvas.width,canvas.height);
+        var top_x=0;
+        var top_y=0;
+        var width=canvas.width;
+        var height=canvas.height;
+        var radius=40;
+        stackBlurCanvasRGB( canvas.id, top_x, top_y, width, height, radius );
+        var bg_image=new Image();
+        bg_image.src=canvas.toDataURL();
+        $(id).css({"background-image":"url("+bg_image.src+")","background-size": "cover"});
+        $("#"+can).remove();
+        $("#"+music_cover).remove();
+      }
+  }
+  function resizeFunction(Spectrum){
+      var currentProgress = Spectrum.getCurrentTime() / Spectrum.getDuration();
+      var isPlaying=false;
+        if(Spectrum.isPlaying()){
+          isPlaying=true;
+        }
+      //Spectrum.empty();
+      //Spectrum.params.height=120;
+      //Spectrum.empty();
+      //Spectrum.backend.peaks=[];
+      Spectrum.drawBuffer();
+      Spectrum.seekTo(currentProgress);
+      if(isPlaying){
+          Spectrum.play();
+      }
+  }
+  var context;
+  var contextClass = (window.AudioContext ||
+  window.webkitAudioContext ||
+  window.mozAudioContext ||
+  window.oAudioContext ||
+  window.msAudioContext);
+   if (contextClass) {
+        context = new contextClass();
+    } else {
+        console.log("Web Audio API is not available. Ask the user to use a supported browser");
+   }
+   function soundCrossFadeConfigLinearly(fadeTime,volume,duration,gainNode,currentTime){
+ 					gainNode.gain.linearRampToValueAtTime(0,currentTime);
+ 					gainNode.gain.linearRampToValueAtTime(volume,currentTime+fadeTime);
+ 					gainNode.gain.linearRampToValueAtTime(volume,currentTime+duration-fadeTime);
+ 					gainNode.gain.linearRampToValueAtTime(0,currentTime+duration);
+ 		}
+     var SSPECTRUM={};
+     var Spec, holder;
+     var mouseClicked={};
+    //$("document").ready(function(){
+        function spectrum(src,spectrum_id,peak){
+                var audio=document.createElement("audio");
+                audio.src=src;
+                var source=context.createMediaElementSource(audio);
+                var gainNode=context.createGain();
+                source.connect(gainNode);
+                gainNode.connect(context.destination);
+                var Spectrum = WaveSurfer.create({
+                      container: spectrum_id,
+                      progressColor: "#E8DAEF",
+                      backend:"MediaElement",
+                      height: 30,
+                      minPxPerSec: 5,
+                      hideScrollbar: true,
+                      audioContext:context
+                });
+                //#00FF00
+                //#DAF7A6
+                //#F1C40F
+                //#F5B7B1
+                //#E8DAEF
+                //#FCF3CF
+                Spectrum.load(audio,peak);
+                return {
+                      spectrum:Spectrum,
+                      audio:audio,
+                      gainNode:gainNode
+                };
+        }
+        function chip(a,x,y,z){
+          $.ajax({
+                type: "GET",
+                url: `/get-album_artwork?num=${x}&data=${y}&user=${z}`,
+                success: function(data){
+                  $(`.${a}`).children(".listview__item__content")
+                  .children(".listview__item__content__right").
+                  children(".listview__content__audio__header")
+                  .children(".listview__content__audio__header__body")
+                  .children(".listview__content__audio__header__body_artwork")
+                  .css({"background": `url("${data}") no-repeat center`,"opacity":"1","background-size":"cover"});
+                  dsyz(a);
+                  whejd(a,data)
+                }
+          });
+        }
+        function whejd(a,src){
+          var id="."+a;
+          var src__=  $(`.${a}`).attr("album_artwork_path");
+          $(`.${a}`).children(".listview__item__content")
+              .children(".listview__item__content__left").
+              children(".listview__item__link")
+              .children(".listview__item__image")
+              .children(".fundy").attr("src",src__);
+          var can=$(`.${a}`).children(".listview__item__content")
+            .children(".listview__item__content__left").
+            children(".listview__item__link")
+            .children(".listview__item__image")
+            .children(".candy").attr("placeholder");
+          var music_cover=$(`.${a}`).children(".listview__item__content")
+              .children(".listview__item__content__left").
+              children(".listview__item__link")
+              .children(".listview__item__image")
+              .children(".fundy").attr("placeholder");
+          bagTwerk(id,music_cover,can,"profile");
+        }
+        var checkHolder=false, u=0;
+        function init_holder(a){
+          if(!checkHolder){
+            holder=$(`.${a}`).attr("min");
+          }else{
+            checkHolder=true;
+          }
+        }
+        function dsyz(a){
+            var id="#"+$(`.${a}`).children(".listview__item__content")
+            .children(".listview__item__content__right")
+            .children(".listview__content__audio__waveform")
+            .children(".listview__content__audio__waveform__body")
+            .children(".waveform").attr("placeholder");
+            var src=$(`.${a}`).attr("audio_path");
+            var peaks=$(`.${a}`).attr("peak_path");
+            if(++u==1){
+              init_holder(a);
+              checkHolder=true;
+            }
+            var loadAudio=function(){
+              var request = new XMLHttpRequest();
+              request.open("GET", peaks, true);
+              request.onload = function() {
+                    var Spectrum=spectrum(src,id,request.response.split(",",1250));
+                    mouseClicked[$(`.${a}`).attr("min")]=false;
+                    SSPECTRUM[$(`.${a}`).attr("min")]=Spectrum;
+                    audioprocess(a,"profile-loaded");
+                    $(window).on("resize",function(event){
+                          event.preventDefault();
+                          resizeFunction(Spectrum.spectrum);
+                    });
+              }
+              request.onerror = function() {
+                  loadAudio();
+                  console.log('BufferLoader: XHR error');
+              }
+              request.send();
+            }
+            loadAudio();
+        }
+        function audioprocess(a,type){
+            if(type=="profile-loaded"){
+              SSPECTRUM[$(`.${a}`).attr("min")].spectrum.setVolume($("#volumeslider_itself2").val());
+              SSPECTRUM[$(`.${a}`).attr("min")].spectrum.savedVolume=$("#volumeslider_itself2").val();
+              SSPECTRUM[$(`.${a}`).attr("min")].spectrum.on("pause",function(){
+                //soundCrossFadeConfigLinearly(15,0.5,SSPECTRUM[$(`.${a}`).attr("min")].spectrum.getDuration()-SSPECTRUM[$(`.${a}`).attr("min")].spectrum.getCurrentTime(),SSPECTRUM[$(`.${a}`).attr("min")].gainNode,context.currentTime);
+                $("#pause_init").hide();
+                $("#play_init").show();
+                $(`.${a}`).children(".listview__item__content")
+                            .children(".listview__item__content__left")
+                            .children(".listview__item__link")
+                            .children(".listview__item__image")
+                            .children(".listview__own__play__pause_pause")
+                            .children(".play_pause_pause__button__cover")
+                            .trigger("click");
+              });
+              SSPECTRUM[$(`.${a}`).attr("min")].spectrum.on("finish",function(){
+                $("#pause_init").hide();
+                $("#play_init").show();
+                $(`.${a}`).children(".listview__item__content")
+                            .children(".listview__item__content__left")
+                            .children(".listview__item__link")
+                            .children(".listview__item__image")
+                            .children(".listview__own__play__pause_pause")
+                            .children(".play_pause_pause__button__cover")
+                            .trigger("click");
+                $("#next").trigger("click");
+              });
+              SSPECTRUM[$(`.${a}`).attr("min")].spectrum.on("audioprocess",function(){
+                 SSPECTRUM[$(`.${a}`).attr("min")].spectrum.setVolume($("#volumeslider_itself2").val());
+                 $("#slider_itself").val(SSPECTRUM[$(`.${a}`).attr("min")].spectrum.getCurrentTime()/SSPECTRUM[$(`.${a}`).attr("min")].spectrum.getDuration());
+              });
+              SSPECTRUM[$(`.${a}`).attr("min")].spectrum.on("play",function(){
+                //soundCrossFadeConfigLinearly(15,0.5,SSPECTRUM[$(`.${a}`).attr("min")].spectrum.getDuration()-SSPECTRUM[$(`.${a}`).attr("min")].spectrum.getCurrentTime(),SSPECTRUM[$(`.${a}`).attr("min")].gainNode,context.currentTime);
+                $("#closemedia_vbox").trigger("click");
+                $("html, body").animate({ scrollTop: $(`.${a}`)[0].offsetTop+200}, "slow");
+                $("#pause_init").show();
+                $("#play_init").hide();
+                holder=$(`.${a}`).attr("min");
+                mouseClicked[$(`.${a}`).attr("min")]=true;
+                $(`.${a}`).children(".listview__item__content")
+                  .children(".listview__item__content__right")
+                  .children(".reaction")
+                  .children(".listview__reaction")
+                  .children(".listview__reaction__button")
+                  .children(".listview__float__back")
+                  .children(".play_me_some")
+                  .hide();
+                $(`.${a}`).children(".listview__item__content")
+                        .children(".listview__item__content__right")
+                        .children(".reaction")
+                        .children(".listview__reaction")
+                        .children(".listview__reaction__button")
+                        .children(".listview__float__back")
+                        .children(".play_me_some")
+                        .children(".play_me_some_play_button")
+                        .hide();
+                $(`.${a}`).children(".listview__item__content")
+                    .children(".listview__item__content__right")
+                    .children(".reaction")
+                    .children(".listview__reaction")
+                    .children(".listview__reaction__button")
+                    .children(".listview__float__back")
+                    .children(".pause_me_some")
+                    .show();
+                $(`.${a}`).children(".listview__item__content")
+                        .children(".listview__item__content__right")
+                        .children(".reaction")
+                        .children(".listview__reaction")
+                        .children(".listview__reaction__button")
+                        .children(".listview__float__back")
+                        .children(".pause_me_some")
+                        .children(".pause_me_some_play_button")
+                        .show();
+                $(`.${a}`).children(".listview__item__content")
+                      .children(".listview__item__content__left")
+                      .children(".listview__item__link")
+                      .children(".listview__item__image")
+                      .children(".listview__own__play__pause")
+                      .hide();
+                $(`.${a}`).children(".listview__item__content")
+                       .children(".listview__item__content__left")
+                       .children(".listview__item__link")
+                       .children(".listview__item__image")
+                       .children(".listview__own__play__pause")
+                       .children(".play_pause__button__cover")
+                       .hide();
+                $(`.${a}`).children(".listview__item__content")
+                  .children(".listview__item__content__left")
+                  .children(".listview__item__link")
+                  .children(".listview__item__image")
+                  .children(".listview__own__play__pause_pause")
+                  .show();
+                $(`.${a}`).children(".listview__item__content")
+                  .children(".listview__item__content__left")
+                  .children(".listview__item__link")
+                  .children(".listview__item__image")
+                  .children(".listview__own__play__pause_pause")
+                  .children(".play_pause_pause__button__cover")
+                  .show();
+                $(`.${a}`).children(".listview__item__content")
+                  .children(".listview__item__content__right")
+                  .children(".reaction")
+                  .children(".listview__reaction")
+                  .children(".listview__reaction__button")
+                  .children(".listview__float__back")
+                  .children(".play_me_some")
+                  .hide();
+                $(`.${a}`).children(".listview__item__content")
+                                            .children(".listview__item__content__right")
+                                            .children(".reaction")
+                                            .children(".listview__reaction")
+                                            .children(".listview__reaction__button")
+                                            .children(".listview__float__back")
+                                            .children(".play_me_some")
+                                            .children(".play_me_some_play_button")
+                                            .hide();
+                $(`.${a}`).children(".listview__item__content")
+                                      .children(".listview__item__content__right")
+                                      .children(".reaction")
+                                      .children(".listview__reaction")
+                                      .children(".listview__reaction__button")
+                                      .children(".listview__float__back")
+                                      .children(".pause_me_some")
+                                      .show();
+                $(`.${a}`).children(".listview__item__content")
+                                          .children(".listview__item__content__right")
+                                          .children(".reaction")
+                                          .children(".listview__reaction")
+                                          .children(".listview__reaction__button")
+                                          .children(".listview__float__back")
+                                          .children(".pause_me_some")
+                                          .children(".pause_me_some_play_button")
+                                          .show();
+              });
+            }else if(type=="single"){
+              var array=Object.keys(SSPECTRUM);
+              for(var j=0;j<array.length;j++){
+                  var x=function(hold){
+                    SSPECTRUM[hold].spectrum.unAll();
+                    SSPECTRUM[hold].spectrum.on("audioprocess",function(){
+                      SSPECTRUM[hold].spectrum.setVolume($("#volumeslider_itself2").val());
+                      $("#slider_itself").val(SSPECTRUM[hold].spectrum.getCurrentTime()/SSPECTRUM[hold].spectrum.getDuration());
+                    });
+                    SSPECTRUM[hold].spectrum.on("play",function(){
+                      $("#closemedia_vbox").trigger("click");
+                      $("#pause_init").show();
+                      $("#play_init").hide();
+                    });
+                    SSPECTRUM[hold].spectrum.on("pause",function(){
+                      $("#pause_init").hide();
+                      $("#play_init").show();
+                    });
+                    SSPECTRUM[hold].spectrum.on("finish",function(){
+                      $("#pause_init").hide();
+                      $("#play_init").show();
+                      $("#pause_init").trigger("click");
+                      $("#next").trigger("click");
+                    });
+                  }
+                  x(array[j]);
+              }
+            }
+        }
+        function chun(a){
+            var id=$(`.${a}`).attr("it");
+            var url=$(`.listview__item__link__${id}`).attr("href");
+            $(`.listview__item__link__${id}`).on("click",function(event){
+                event.preventDefault();
+                $.ajax({
+                  type: "GET",
+                  url: url,
+                  async: true,
+                  success: function(data){
+                        var history=window.History.createBrowserHistory({
+                            basename: "",
+                            forceRefresh: false,
+                            keyLength: 6
+                        });
+                        history.push(url,{doc: data});
+                        window.addEventListener('popstate', function(e) {
+                            $("#mediaboo").html(e.state.state.doc);
+                        });
+                        audioprocess("","single");
+                        $("#mediaboo").html(data);
+                  }
+                })
+            });
+             <%if(user){%>
+             var src="<%=locals.user.profile_image%>";
+             src=src.replace("./uploads","");
+             $(`.${a}`).children(".listview__item__content")
+                                     .children(".listview__item__content__right")
+                                     .children(".reaction")
+                                     .children(".listview__reaction")
+                                     .children(".listview__comment")
+                                     .children(".listview__img")
+                                     .attr("src",`${src}`);
+             <%}%>
+
+              $(`.${a}`).children(".listview__item__content")
+                .children(".listview__item__content__left")
+                .children(".listview__item__link")
+                .mouseover(function(){
+                      if(!mouseClicked[$(`.${a}`).attr("min")]){
+                        $(this)
+                          .children(".listview__item__image")
+                          .children(".listview__own__play__pause")
+                          .show();
+                        $(this)
+                          .children(".listview__item__image")
+                          .children(".listview__own__play__pause")
+                          .children(".play_pause__button__cover")
+                          .show();
+                      }else{
+                        $(this)
+                          .children(".listview__item__image")
+                          .children(".listview__own__play__pause_pause")
+                          .show();
+                        $(this)
+                          .children(".listview__item__image")
+                          .children(".listview__own__play__pause_pause")
+                          .children(".play_pause_pause__button__cover")
+                          .show();
+                      }
+                });
+              $(`.${a}`).children(".listview__item__content")
+                  .children(".listview__item__content__left")
+                  .children(".listview__item__link")
+                  .mouseout(function(){
+                      $(this)
+                        .children(".listview__item__image")
+                        .children(".listview__own__play__pause")
+                        .hide();
+                      $(this)
+                        .children(".listview__item__image")
+                        .children(".listview__own__play__pause")
+                        .children(".play_pause__button__cover")
+                        .hide();
+                      $(this)
+                          .children(".listview__item__image")
+                          .children(".listview__own__play__pause_pause")
+                          .hide();
+                      $(this)
+                        .children(".listview__item__image")
+                        .children(".listview__own__play__pause_pause")
+                        .children(".play_pause_pause__button__cover")
+                        .hide();
+                  });
+              $(`.${a}`).children(".listview__item__content")
+                    .children(".listview__item__content__left")
+                    .children(".listview__item__link")
+                    .children(".listview__item__image")
+                    .children(".listview__own__play__pause")
+                    .children(".play_pause__button__cover")
+                    .click(function(event){
+                        event.preventDefault();
+                        SSPECTRUM[holder].spectrum.pause();
+                        window.Spec=SSPECTRUM[$(`.${a}`).attr("min")];
+                        window.Spec.spectrum.play();
+                        return false;
+                    });
+              $(`.${a}`).children(".listview__item__content")
+                          .children(".listview__item__content__left")
+                          .children(".listview__item__link")
+                          .children(".listview__item__image")
+                          .children(".listview__own__play__pause_pause")
+                          .children(".play_pause_pause__button__cover")
+                          .click(function(event){
+                              event.preventDefault();
+                              SSPECTRUM[holder].spectrum.pause();
+                              holder=$(`.${a}`).attr("min");
+                              mouseClicked[$(`.${a}`).attr("min")]=false;
+                              $(`.${a}`).children(".listview__item__content")
+                                    .children(".listview__item__content__left")
+                                    .children(".listview__item__link")
+                                    .children(".listview__item__image")
+                                    .children(".listview__own__play__pause_pause")
+                                    .hide();
+                              $(this).hide();
+                              $(`.${a}`).children(".listview__item__content")
+                                .children(".listview__item__content__left")
+                                .children(".listview__item__link")
+                                .children(".listview__item__image")
+                                .children(".listview__own__play__pause")
+                                .show();
+                              $(`.${a}`).children(".listview__item__content")
+                                .children(".listview__item__content__left")
+                                .children(".listview__item__link")
+                                .children(".listview__item__image")
+                                .children(".listview__own__play__pause")
+                                .children(".play_pause__button__cover")
+                                .show();
+                              $(`.${a}`).children(".listview__item__content")
+                                                      .children(".listview__item__content__right")
+                                                      .children(".reaction")
+                                                      .children(".listview__reaction")
+                                                      .children(".listview__reaction__button")
+                                                      .children(".listview__float__back")
+                                                      .children(".pause_me_some")
+                                                      .hide();
+                              $(`.${a}`).children(".listview__item__content")
+                                                          .children(".listview__item__content__right")
+                                                          .children(".reaction")
+                                                          .children(".listview__reaction")
+                                                          .children(".listview__reaction__button")
+                                                          .children(".listview__float__back")
+                                                          .children(".pause_me_some")
+                                                          .children(".pause_me_some_play_button")
+                                                          .hide();
+                              $(`.${a}`).children(".listview__item__content")
+                                  .children(".listview__item__content__right")
+                                  .children(".reaction")
+                                  .children(".listview__reaction")
+                                  .children(".listview__reaction__button")
+                                  .children(".listview__float__back")
+                                  .children(".play_me_some")
+                                  .show();
+                              $(`.${a}`).children(".listview__item__content")
+                                                            .children(".listview__item__content__right")
+                                                            .children(".reaction")
+                                                            .children(".listview__reaction")
+                                                            .children(".listview__reaction__button")
+                                                            .children(".listview__float__back")
+                                                            .children(".play_me_some")
+                                                            .children(".play_me_some_play_button")
+                                                            .show();
+                              return false;
+                          });
+              $('[data-toggle="popover"]').popover();
+
+              $(`.${a}`).children(".listview__item__content")
+                  .children(".listview__item__content__right")
+                  .children(".reaction")
+                  .children(".listview__reaction")
+                  .children(".listview__reaction__button")
+                  .children(".listview__float__back")
+                  .children(".play_me_some")
+                  .children(".play_me_some_play_button")
+                  .mouseover(function(){
+                      $(this).css({"fill":"orange"});
+               });
+              $(`.${a}`).children(".listview__item__content")
+                    .children(".listview__item__content__right")
+                    .children(".reaction")
+                    .children(".listview__reaction")
+                    .children(".listview__reaction__button")
+                    .children(".listview__float__back")
+                    .children(".play_me_some")
+                    .children(".play_me_some_play_button")
+                    .mouseout(function(){
+                        $(this).css({"fill":"slategray"});
+                });
+              $(`.${a}`).children(".listview__item__content")
+                  .children(".listview__item__content__right")
+                  .children(".reaction")
+                  .children(".listview__reaction")
+                  .children(".listview__reaction__button")
+                  .children(".listview__float__back")
+                  .children(".pause_me_some")
+                  .children(".pause_me_some_play_button")
+                  .mouseover(function(){
+                      $(this).css({"fill":"orange"});
+               });
+              $(`.${a}`).children(".listview__item__content")
+                    .children(".listview__item__content__right")
+                    .children(".reaction")
+                    .children(".listview__reaction")
+                    .children(".listview__reaction__button")
+                    .children(".listview__float__back")
+                    .children(".pause_me_some")
+                    .children(".pause_me_some_play_button")
+                    .mouseout(function(){
+                        $(this).css({"fill":"slategray"});
+                });
+              $(`.${a}`).children(".listview__item__content")
+                  .children(".listview__item__content__right")
+                  .children(".reaction")
+                  .children(".listview__reaction")
+                  .children(".listview__reaction__button")
+                  .children(".listview__float__back")
+                  .children(".pause_me_some")
+                  .children(".pause_me_some_play_button")
+                  .click(function(){
+                      $(`.${a}`).children(".listview__item__content")
+                        .children(".listview__item__content__right")
+                        .children(".reaction")
+                        .children(".listview__reaction")
+                        .children(".listview__reaction__button")
+                        .children(".listview__float__back")
+                        .children(".pause_me_some")
+                        .hide();
+                      $(this).hide();
+                      SSPECTRUM[holder].spectrum.pause();
+                      holder=$(`.${a}`).attr("min");
+                      mouseClicked[$(`.${a}`).attr("min")]=false;
+                      $(`.${a}`).children(".listview__item__content")
+                          .children(".listview__item__content__right")
+                          .children(".reaction")
+                          .children(".listview__reaction")
+                          .children(".listview__reaction__button")
+                          .children(".listview__float__back")
+                          .children(".play_me_some")
+                          .show();
+                      $(`.${a}`).children(".listview__item__content")
+                              .children(".listview__item__content__right")
+                              .children(".reaction")
+                              .children(".listview__reaction")
+                              .children(".listview__reaction__button")
+                              .children(".listview__float__back")
+                              .children(".play_me_some")
+                              .children(".play_me_some_play_button")
+                              .show();
+               });
+              $(`.${a}`).children(".listview__item__content")
+                    .children(".listview__item__content__right")
+                    .children(".reaction")
+                    .children(".listview__reaction")
+                    .children(".listview__reaction__button")
+                    .children(".listview__float__back")
+                    .children(".play_me_some")
+                    .children(".play_me_some_play_button")
+                    .click(function(){
+                      SSPECTRUM[holder].spectrum.pause();
+                      window.Spec=SSPECTRUM[$(`.${a}`).attr("min")];
+                      window.Spec.spectrum.play();
+                });
+              $(`.${a}`).children(".listview__item__content")
+                  .children(".listview__item__content__right")
+                  .children(".reaction")
+                  .children(".listview__reaction")
+                  .children(".listview__reaction__button")
+                  .children(".listview__float__back")
+                  .children(".other_reaction_goes")
+                  .children(".give__her")
+                  .children(".like")
+                  .children(".like__button")
+                  .mouseover(function(){
+                      $(this).css({"fill":"orange"});
+                      $(`.${a}`).children(".listview__item__content")
+                          .children(".listview__item__content__right")
+                          .children(".reaction")
+                          .children(".listview__reaction")
+                          .children(".listview__reaction__button")
+                          .children(".listview__float__back")
+                          .children(".other_reaction_goes")
+                          .children(".give__her")
+                          .children(".like")
+                          .children(".like_stat")
+                          .css({"color":"orange"});
+              });
+              $(`.${a}`).children(".listview__item__content")
+                    .children(".listview__item__content__right")
+                    .children(".reaction")
+                    .children(".listview__reaction")
+                    .children(".listview__reaction__button")
+                    .children(".listview__float__back")
+                    .children(".other_reaction_goes")
+                    .children(".give__her")
+                    .children(".like")
+                    .children(".like__button")
+                    .mouseout(function(){
+                        $(this).css({"fill":"slategray"});
+                        $(`.${a}`).children(".listview__item__content")
+                          .children(".listview__item__content__right")
+                          .children(".reaction")
+                          .children(".listview__reaction")
+                          .children(".listview__reaction__button")
+                          .children(".listview__float__back")
+                          .children(".other_reaction_goes")
+                          .children(".give__her")
+                          .children(".like")
+                          .children(".like_stat")
+                          .css({"color":"slategray"});
+                    });
+              $(`.${a}`).children(".listview__item__content")
+                      .children(".listview__item__content__right")
+                      .children(".reaction")
+                      .children(".listview__reaction")
+                      .children(".listview__reaction__button")
+                      .children(".listview__float__back")
+                      .children(".other_reaction_goes")
+                      .children(".give__her")
+                      .children(".like")
+                      .children(".like_stat")
+                      .mouseover(function(){
+                          $(this).css({"color":"orange"});
+                          $(`.${a}`).children(".listview__item__content")
+                            .children(".listview__item__content__right")
+                            .children(".reaction")
+                            .children(".listview__reaction")
+                            .children(".listview__reaction__button")
+                            .children(".listview__float__back")
+                            .children(".other_reaction_goes")
+                            .children(".give__her")
+                            .children(".like")
+                            .children(".like__button")
+                            .css({"fill":"orange"});
+                      });
+              $(`.${a}`).children(".listview__item__content")
+                .children(".listview__item__content__right")
+                .children(".reaction")
+                .children(".listview__reaction")
+                .children(".listview__reaction__button")
+                .children(".listview__float__back")
+                .children(".other_reaction_goes")
+                .children(".give__her")
+                .children(".like")
+                .children(".like_stat")
+                .mouseout(function(){
+                    $(this).css({"color":"slategray"});
+                    $(`.${a}`).children(".listview__item__content")
+                      .children(".listview__item__content__right")
+                      .children(".reaction")
+                      .children(".listview__reaction")
+                      .children(".listview__reaction__button")
+                      .children(".listview__float__back")
+                      .children(".other_reaction_goes")
+                      .children(".give__her")
+                      .children(".like")
+                      .children(".like__button")
+                      .css({"fill":"slategray"});
+                });
+              $(`.${a}`).children(".listview__item__content")
+                    .children(".listview__item__content__right")
+                    .children(".reaction")
+                    .children(".listview__reaction")
+                    .children(".listview__reaction__button")
+                    .children(".listview__float__back")
+                    .children(".other_reaction_goes")
+                    .children(".give__her")
+                    .children(".dislike")
+                    .children(".dislike__button")
+                    .mouseover(function(){
+                        $(this).css({"fill":"orange"});
+                        $(`.${a}`).children(".listview__item__content")
+                            .children(".listview__item__content__right")
+                            .children(".reaction")
+                            .children(".listview__reaction")
+                            .children(".listview__reaction__button")
+                            .children(".listview__float__back")
+                            .children(".other_reaction_goes")
+                            .children(".give__her")
+                            .children(".dislike")
+                            .children(".dislike_stat")
+                            .css({"color":"orange"});
+                });
+              $(`.${a}`).children(".listview__item__content")
+                      .children(".listview__item__content__right")
+                      .children(".reaction")
+                      .children(".listview__reaction")
+                      .children(".listview__reaction__button")
+                      .children(".listview__float__back")
+                      .children(".other_reaction_goes")
+                      .children(".give__her")
+                      .children(".dislike")
+                      .children(".dislike__button")
+                      .mouseout(function(){
+                          $(this).css({"fill":"slategray"});
+                          $(`.${a}`).children(".listview__item__content")
+                            .children(".listview__item__content__right")
+                            .children(".reaction")
+                            .children(".listview__reaction")
+                            .children(".listview__reaction__button")
+                            .children(".listview__float__back")
+                            .children(".other_reaction_goes")
+                            .children(".give__her")
+                            .children(".dislike")
+                            .children(".dislike_stat")
+                            .css({"color":"slategray"});
+                      });
+              $(`.${a}`).children(".listview__item__content")
+                        .children(".listview__item__content__right")
+                        .children(".reaction")
+                        .children(".listview__reaction")
+                        .children(".listview__reaction__button")
+                        .children(".listview__float__back")
+                        .children(".other_reaction_goes")
+                        .children(".give__her")
+                        .children(".dislike")
+                        .children(".dislike_stat")
+                        .mouseover(function(){
+                            $(this).css({"color":"orange"});
+                            $(`.${a}`).children(".listview__item__content")
+                              .children(".listview__item__content__right")
+                              .children(".reaction")
+                              .children(".listview__reaction")
+                              .children(".listview__reaction__button")
+                              .children(".listview__float__back")
+                              .children(".other_reaction_goes")
+                              .children(".give__her")
+                              .children(".dislike")
+                              .children(".dislike__button")
+                              .css({"fill":"orange"});
+                        });
+              $(`.${a}`).children(".listview__item__content")
+                  .children(".listview__item__content__right")
+                  .children(".reaction")
+                  .children(".listview__reaction")
+                  .children(".listview__reaction__button")
+                  .children(".listview__float__back")
+                  .children(".other_reaction_goes")
+                  .children(".give__her")
+                  .children(".dislike")
+                  .children(".dislike_stat")
+                  .mouseout(function(){
+                      $(this).css({"color":"slategray"});
+                      $(`.${a}`).children(".listview__item__content")
+                        .children(".listview__item__content__right")
+                        .children(".reaction")
+                        .children(".listview__reaction")
+                        .children(".listview__reaction__button")
+                        .children(".listview__float__back")
+                        .children(".other_reaction_goes")
+                        .children(".give__her")
+                        .children(".dislike")
+                        .children(".dislike__button")
+                        .css({"fill":"slategray"});
+                  });
+              $(`.${a}`).children(".listview__item__content")
+                            .children(".listview__item__content__right")
+                            .children(".reaction")
+                            .children(".listview__reaction")
+                            .children(".listview__reaction__button")
+                            .children(".listview__float__back")
+                            .children(".other_reaction_goes")
+                            .children(".give__her")
+                            .children(".share")
+                            .children(".share__button")
+                            .mouseover(function(){
+                                $(this).css({"fill":"orange"});
+                                $(`.${a}`).children(".listview__item__content")
+                                        .children(".listview__item__content__right")
+                                        .children(".reaction")
+                                        .children(".listview__reaction")
+                                        .children(".listview__reaction__button")
+                                        .children(".listview__float__back")
+                                        .children(".other_reaction_goes")
+                                        .children(".give__her")
+                                        .children(".share")
+                                        .children(".share_stat")
+                                        .css({"color":"orange"});
+                            });
+              $(`.${a}`).children(".listview__item__content")
+                      .children(".listview__item__content__right")
+                      .children(".reaction")
+                      .children(".listview__reaction")
+                      .children(".listview__reaction__button")
+                      .children(".listview__float__back")
+                      .children(".other_reaction_goes")
+                      .children(".give__her")
+                      .children(".share")
+                      .children(".share__button")
+                      .mouseout(function(){
+                          $(this).css({"fill":"slategray"});
+                          $(`.${a}`).children(".listview__item__content")
+                                  .children(".listview__item__content__right")
+                                  .children(".reaction")
+                                  .children(".listview__reaction")
+                                  .children(".listview__reaction__button")
+                                  .children(".listview__float__back")
+                                  .children(".other_reaction_goes")
+                                  .children(".give__her")
+                                  .children(".share")
+                                  .children(".share_stat")
+                                  .css({"color":"slategray"});
+                      });
+              $(`.${a}`).children(".listview__item__content")
+                                    .children(".listview__item__content__right")
+                                    .children(".reaction")
+                                    .children(".listview__reaction")
+                                    .children(".listview__reaction__button")
+                                    .children(".listview__float__back")
+                                    .children(".other_reaction_goes")
+                                    .children(".give__her")
+                                    .children(".share")
+                                    .children(".share_stat")
+                                    .mouseover(function(){
+                                        $(this).css({"color":"orange"});
+                                        $(`.${a}`).children(".listview__item__content")
+                                                .children(".listview__item__content__right")
+                                                .children(".reaction")
+                                                .children(".listview__reaction")
+                                                .children(".listview__reaction__button")
+                                                .children(".listview__float__back")
+                                                .children(".other_reaction_goes")
+                                                .children(".give__her")
+                                                .children(".share")
+                                                .children(".share__button")
+                                                .css({"fill":"orange"});
+                                    });
+              $(`.${a}`).children(".listview__item__content")
+                              .children(".listview__item__content__right")
+                              .children(".reaction")
+                              .children(".listview__reaction")
+                              .children(".listview__reaction__button")
+                              .children(".listview__float__back")
+                              .children(".other_reaction_goes")
+                              .children(".give__her")
+                              .children(".share")
+                              .children(".share_stat")
+                              .mouseout(function(){
+                                  $(this).css({"color":"slategray"});
+                                  $(`.${a}`).children(".listview__item__content")
+                                          .children(".listview__item__content__right")
+                                          .children(".reaction")
+                                          .children(".listview__reaction")
+                                          .children(".listview__reaction__button")
+                                          .children(".listview__float__back")
+                                          .children(".other_reaction_goes")
+                                          .children(".give__her")
+                                          .children(".share")
+                                          .children(".share__button")
+                                          .css({"fill":"slategray"});
+                              });
+              $(`.${a}`).children(".listview__item__content")
+                            .children(".listview__item__content__right")
+                            .children(".reaction")
+                            .children(".listview__reaction")
+                            .children(".listview__reaction__button")
+                            .children(".listview__float__back")
+                            .children(".other_reaction_goes")
+                            .children(".give__her")
+                            .children(".menue")
+                            .children(".menu__button")
+                            .mouseover(function(){
+                              $(`.${a}`).children(".listview__item__content")
+                                            .children(".listview__item__content__right")
+                                            .children(".reaction")
+                                            .children(".listview__reaction")
+                                            .children(".listview__reaction__button")
+                                            .children(".listview__float__back")
+                                            .children(".other_reaction_goes")
+                                            .children(".give__her")
+                                            .children(".menue")
+                                            .children(".menu__button")
+                                            .children(".take-on")
+                                            .css({"background-color":"orange"});
+              });
+              $(`.${a}`).children(".listview__item__content")
+                            .children(".listview__item__content__right")
+                            .children(".reaction")
+                            .children(".listview__reaction")
+                            .children(".listview__reaction__button")
+                            .children(".listview__float__back")
+                            .children(".other_reaction_goes")
+                            .children(".give__her")
+                            .children(".menue")
+                            .children(".menu__button")
+                            .mouseout(function(){
+                              $(`.${a}`).children(".listview__item__content")
+                                            .children(".listview__item__content__right")
+                                            .children(".reaction")
+                                            .children(".listview__reaction")
+                                            .children(".listview__reaction__button")
+                                            .children(".listview__float__back")
+                                            .children(".other_reaction_goes")
+                                            .children(".give__her")
+                                            .children(".menue")
+                                            .children(".menu__button")
+                                            .children(".take-on")
+                                            .css({"background-color":"slategray"});
+                  });
+        }
+        function ripmysoul(y,a){
+          return new Promise(function(resolve,reject){
+            $(`.${a}`).children(".listview__item__content")
+            .children(".listview__video__item__content__right")
+            .children(".midform")
+            .children(".video_in__listview__title")
+            .children(".title_body")
+            .children(".video__play__button")
+            .click(function(){
+                var file_path=$(`.${a}`).attr("video_path").slice((Math.max(0, $(`.${a}`).attr("video_path").lastIndexOf("/")) || Infinity) + 1);
+                var video_dash=$(`.${a}`).attr("video_path")+"/"+file_path+"_dash/"+file_path+"_Full.mpd",
+                     video_hls=$(`.${a}`).attr("video_path")+"/"+file_path+"_hsl/all.m3u8",
+                     artwork=$(`.${a}`).attr("video_path")+"/"+file_path+".png",
+                     file_path_modified=file_path.substr(file_path.lastIndexOf("_")+1,file_path.length),
+                     src=$(`.${a}`).attr("video_path")+"/"+file_path+"."+file_path_modified;
+                $("#video").attr("dash",video_dash);
+                $("#video").attr("hls",video_hls);
+                $("#video").attr("loc",src);
+                $("#video").attr("poster",$(`.${a}`).attr("thubnail_path"));
+                $("#video").attr("title", $(`.${a}`).attr("video_title"));
+                $("#video").attr("user",$(`.${a}`).attr("user"));
+                $("#video").attr("album",$(`.${a}`).attr("playlist_id"));
+                $("#video").attr("artworkPath",artwork);
+                //$("#video-range-badge").attr("src",$("#video").attr("artworkPath"));
+                VideoPlayer.init("video");
+                $("#media_box").hide();
+                $("#media_vidbox").css({"display":"block"});
+                var elements = $('#media_vidbox');
+                Stickyfill.add(elements);
+                Stickyfill.refreshAll();
+                $("#pause_init").trigger("click");
+                $("#video-play-pause-button").hide();
+                $("#video-play-pop-butt").show();
+            });
+
+            $(`.${a}`).children(".listview__item__content")
+            .children(".listview__video__item__content__left").
+            children(".video__butt__thumb")
+            .css({"background": `url("${y}") no-repeat center`,"opacity":"1","background-size":"cover"});
+
+            $(`.${a}`).children(".listview__item__content")
+            .children(".listview__video__item__content__left").
+            children(".video__butt__thumb")
+            .mouseover(function(){
+                 $(this).css({"transform": "scale(1.5)"});
+            });
+
+            $(`.${a}`).children(".listview__item__content")
+            .children(".listview__video__item__content__left").
+            children(".video__butt__thumb")
+            .mouseout(function(){
+                 $(this).css({"transform": "scale(1)"});
+            });
+
+            resolve();
+          });
+        }
+  $("document").ready(function(){
+        $("#volume_butt").popover();
+        $("#play_init").on("click",function(){
+              SSPECTRUM[holder].spectrum.play();
+        });
+        $("#pause_init").on("click",function(){
+           SSPECTRUM[holder].spectrum.pause();
+        });
+        $("#next").on("click",function(){
+          $("#pause_init").trigger("click");
+           var array=Object.keys(SSPECTRUM);
+           for(var fun=0;fun<array.length;fun++){
+             if(array[fun]==holder){
+               ++fun;
+                 if(fun>(array.length-1)) fun=0;
+                 break;
+             }
+           }
+           holder=array[fun];
+           $("#play_init").trigger("click");
+        });
+        $("#prev").on("click",function(){
+          $("#pause_init").trigger("click");
+           var array=Object.keys(SSPECTRUM);
+           for(var fun=0;fun<array.length;fun++){
+             if(array[fun]==holder){
+               --fun;
+                 if(fun<0) fun=array.length-1;
+                 break;
+             }
+           }
+           holder=array[fun];
+           $("#play_init").trigger("click");
+        });
+        var repeat_checker=false;
+        $("#repeat").on("click",function(){
+             repeat_checker=!repeat_checker;
+             if(repeat_checker){
+               var t=holder;
+               $(this).attr("title","repeat off");
+               $("#repeat_id").css({"fill":"purple"});
+               SSPECTRUM[t].spectrum.on("finish",function(){
+                    $("#pause_init").trigger("click");
+                    SSPECTRUM[t].spectrum.play();
+               });
+             }else{
+               $(this).attr("title","repeat on");
+               $("#repeat_id").css({"fill":"rgba(45, 150, 172, .8)"});
+               SSPECTRUM[holder].spectrum.on("finish",function(){
+                    $("#next").trigger("click");
+               });
+             }
+        });
+        $("#slider_itself").on("input",function(){
+           SSPECTRUM[holder].spectrum.seekTo($(this).val());
+        });
+        $("#volumeslider_itself2").on("change",function(){
+           SSPECTRUM[holder].spectrum.setVolume($(this).val());
+           var array=Object.keys(SSPECTRUM);
+           for(var fun=0;fun<array.length;fun++){
+             SSPECTRUM[array[fun]].spectrum.setVolume($(this).val());
+           }
+        });
+    });
+    //});
+</script>

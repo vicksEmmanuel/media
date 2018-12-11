@@ -1,0 +1,238 @@
+<script>
+        var playlist_title="playlist"+Math.floor(Math.random()*100)+""+Date.now();
+        window.Audio._createObj(playlist_title);
+      $("document").ready(function(){
+        function process(data,a,attr,peak,conquer){
+          var createdSpectrum=window.Audio._createSpectrum(data[0].audio_path, window.Audio._getDefaultContainer(), peak, data[0]);
+          putIn(createdSpectrum,attr,conquer);
+        }
+        function putIn(createdSpectrum,attr,conquer){
+          window.Audio._getSpectrum()[playlist_title][attr]=createdSpectrum;
+          window.Audio._addSpectrumFuncDefaultly(playlist_title,attr,conquer);
+        }
+        function addAudio(a,data,attr){
+          var conquer={title: data[0].audio_name, artist:  data[0].artist_name, album:  data[0].album_name, artworks:[
+            {src:  data[0].album_artwork_path,  sizes:"512x512" , type:"image/jpg"},
+            {src:  data[0].album_artwork_path,  sizes:"256x256" , type:"image/png"}
+          ]};
+          process(data,a,attr,[],conquer);
+        }
+        function getAllAudio(a,t,f,z){
+          $.ajax({
+            type: "GET",
+            url: `/get-all-audios?user=${z}&id=${t}&privacy=${f}`,
+            success: function(data){
+                addAudio(a,data,$(`.${a}`).attr("min"));
+                write(a,data);
+            }
+          });
+        }
+        function write(a,data){
+          $(`.${a}`)
+          .children(".listview__item__content__all")
+          .children(".evv")
+          .attr("href",`/${data[1]}?listen=${data[0].audio_name}&dxzy=${data[0].id}`)
+          .attr("title",`${data[1]+"/"+data[0].audio_name}`);
+
+          $(`.${a}`)
+          .children(".listview__item__content__all")
+          .children(".evv")
+          .children(".top-corner")
+          .children(".play_container_holder").click(function(event){
+              event.preventDefault();
+              //addAudio(a,data,$(`.${a}`).attr("min"));
+              window.Audio._getPauseButton().trigger("click");
+              window.Audio._setDifferentiator(playlist_title);
+              window.Audio._setHolder($(`.${a}`).attr("min"));
+              window.Audio._getPlayButton().trigger("click");
+              return false;
+          });
+
+          $(`.${a}`)
+          .children(".listview__item__content__all")
+          .children(".evv")
+          .on("click",function(event){
+              event.preventDefault();
+              $.ajax({
+                type: "GET",
+                url: $(this).attr("href"),
+                success: function(data){
+                  $("html, body").animate({ scrollTop: 0}, "slow");
+                  $("#mediaboo").html(data);
+                }
+              })
+          });
+
+          $(`.${a}`)
+          .children(".listview__item__content__all")
+          .children(".evv")
+          .children(".top-corner")
+          .css({"background":`url("${data[0].album_artwork_path}") no-repeat center`, "background-size":"cover","border-radius":"3px"});
+
+          $(`.${a}`)
+          .children(".listview__item__content__all")
+          .children(".evv")
+          .children(".down-corner")
+          .children(".down-corner-left")
+          .children(".media-name")
+          .html(`${data[0].audio_name}`);
+
+          $(`.${a}`)
+          .children(".listview__item__content__all")
+          .children(".evv")
+          .children(".down-corner")
+          .children(".down-corner-left")
+          .children(".year-created")
+          .html(`${data[0].year_created}`);
+        }
+        function getAllVideo(a,t,f,z){
+          $.ajax({
+            async: true,
+            type: "GET",
+            url: `/get-all-videos?user=${z}&id=${t}&privacy=${f}`,
+            success: function(data){
+                write(a,data);
+            }
+          });
+        }
+        var observer = new MutationObserver(function(mutations) {
+            for(var i=0;i<mutations.length; i++){
+                if(mutations[i].addedNodes.length>=1){
+                    for(j=0;j<mutations[i].addedNodes.length;j++){
+                      var qup=(2*j+1);
+                       if(qup in mutations[i].addedNodes){
+                         if(mutations[i].addedNodes[qup].attributes.type.value=="audio"){
+                           var x=qup,
+                           z=mutations[i].addedNodes[qup].attributes.user.value,
+                           a=mutations[i].addedNodes[qup].attributes.placeholder.value;
+                           t=mutations[i].addedNodes[qup].attributes.media_id.value;
+                           f=mutations[i].addedNodes[qup].attributes.privacy.value;
+                           getAllAudio(a,t,f,z);
+                         }else if(mutations[i].addedNodes[qup].attributes.type.value=="video"){
+                           var x=qup;
+                           z=mutations[i].addedNodes[qup].attributes.user.value,
+                           a=mutations[i].addedNodes[qup].attributes.placeholder.value;
+                           t=mutations[i].addedNodes[qup].attributes.media_id.value;
+                           f=mutations[i].addedNodes[qup].attributes.privacy.value;
+                           getAllVideo(a,t,f,z);
+                         }
+                       }
+                    }
+                }
+            }
+        });
+        var config = {
+          attributes: true,
+          childList: true,
+          characterData: true
+        };
+        observer.observe(document.querySelector(".playing_list_listview"), config);
+      });
+</script>
+<div id="playing_list">
+    <ul class="playing_list_listview">
+    </ul>
+    <script>
+            if (!('IntersectionObserver' in window)){
+              alert("none here");
+              document.body.classList.add('polyfill');
+            }
+                var pageSize = 3,
+                sentinel = {
+                    el: null,
+                    set: function(el) {
+                        this.el = el;
+                        this.el.classList.add('sentinel');
+                        sentinelObserver.observe(this.el);
+                    },
+                    unset: function() {
+                        if (!this.el)
+                            return;
+                        sentinelObserver.unobserve(this.el);
+                        this.el.classList.remove('sentinel');
+                        this.el = null;
+                    }
+                },
+                sentinelListener = function(entries) {
+                    sentinel.unset();
+                    listView.classList.add('loading');
+                    nextPage().then(() => {
+                        updateSentinel();
+                        listView.classList.remove('loading');
+                    });
+                },
+                updateSentinel = function() {
+                    sentinel.set(listView.children[listView.children.length - pageSize]);
+                },
+                nextPage = function() {
+                    return loadNextPage().then((items) => {
+                        listView.insertAdjacentHTML(
+                            'beforeend',
+                            items.map(function(item){
+                                return `  <li class="listview__item__all placeholder--${item.id}"  media_id="${item.id_media}" privacy="${item.privacy}" user="${item.user_id}" type="${item.type}" placeholder="placeholder--${item.id}" item_no="${item.id}" min="${Date.now()+""+Math.floor(Math.random() * 1000) +""+ Math.floor(Math.random() * 1000)+""+1}">
+                                                  <div class="listview__item__content__all">
+                                                    <a href="#" titlte="" style="text-decoration:none" class="evv">
+                                                      <div class="top-corner">
+                                                          <div class="play_container_holder play_container_holder--${item.id}"></div>
+                                                      </div>
+                                                      <div class="down-corner">
+                                                          <div class="down-corner-left">
+                                                              <div class="media-name"></div>
+                                                              <div class="year-created"></div>
+                                                          </div>
+                                                          <div class="down-corner-right">
+                                                              <div class="waveform-holder--${item.id}" style="display:none"></div>
+                                                          </div>
+                                                      </div>
+                                                    </a>
+                                                  </div>
+                                              </li>`;
+                            }).join('')
+                        );
+
+                    });
+                  },
+                loadNextPage = (function() {
+                    var pageNumber = 0;
+                    return function () {
+                        return new Promise(function(resolve, reject) {
+                            $.ajax({
+                              async: true,
+                              type:'GET',
+                              url: '/get-all-happening',
+                              success:function(data){
+                                  if(data.length>0){
+                                    var items = [];
+                                    for (var id = pageNumber*pageSize, lastId = id + pageSize - 1; id <= lastId; ++id) {
+                                        if(id<data.length){
+                                          items.push({
+                                            id: id,
+                                            type:data[id].type,
+                                            privacy: data[id].privacy,
+                                            id_media: data[id].id_media,
+                                            user_id: data[id].user_id
+                                          });
+                                        }else{
+                                          $("#js-loading").hide();
+                                        }
+                                    }
+                                    pageNumber++;
+                                    setTimeout(function() { resolve(items); }, getRandomInRange(500, 4000));
+                                  }else{
+                                          $("#js-loading").hide();
+                                  }
+                                }
+                            });
+                        });
+                    }
+                })(),
+                getRandomInRange = function(min, max) {
+                    return Math.floor(Math.random() * (max - min + 1)) + min;
+                },
+                listView = document.querySelector('.playing_list_listview'),
+                sentinelObserver = new IntersectionObserver(sentinelListener, {threshold: 1}) ;
+                nextPage().then(() => {
+                    nextPage().then(updateSentinel);
+                });
+    </script>
+</div>

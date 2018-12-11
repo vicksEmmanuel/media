@@ -1,0 +1,201 @@
+    #profile-image{
+      width:100px;
+      height: 100px;
+      border-radius: 50%;
+      background-color:gray;
+      position: relative;
+      left: 33%;
+      top:-25px;
+    }
+    #side-nav-link-list{
+      list-style: none;
+      width: 100%;
+      padding: 0px;
+      margin: 0px;
+      text-align: center;
+      display: none;
+    }
+    .side-nav-link-list{
+      width: 100%;
+      font-size: 20px;
+    }
+    #logout-button{
+      width: 100%;
+      height: 50px;
+      background-color: inherit;
+      margin: 0px;
+      border:0px;
+    }
+    #logout-button:hover{
+      background-color: orange;
+      color:white;
+    }
+
+    #profile-link{
+      width: 100%;
+      height: 50px;
+      background-color: black;
+      margin: 0px;
+      border:0px;
+    }
+    #profile-link > a{
+      text-decoration: none;
+      position: relative;
+      color: dodgerblue;
+      top: 10px;
+    }
+
+    #side-nav-link-div{
+      display: block;
+      width: 100%;
+      position: relative;
+      top:20px;
+    }
+    #sign-up{
+      background-color: orange;
+      border-radius: 3px;
+      border-width: thin;
+      border: 0px;
+      color:white;
+    }
+    #header{
+      position: relative;
+      top:-20px;
+      z-index: 200;
+      opacity: 0.9;
+      filter: alpha(opacity=60);
+    }
+    .sticky > #header-content > #logo-section{
+      position: fixed;
+      top:-8px;
+      z-index: 200;
+      opacity: 1;
+      filter: alpha(opacity=60);
+    }
+
+    .drop-down-icon{
+      background-color: orange;
+      margin-top:2px;
+      width:25px;
+      height:3px;
+      position: relative;
+    }
+    #drop-down{
+      padding-left: 10px;
+      margin-right:10px;
+      display: inline;
+      width:25px;
+    }
+    #icon{
+      display: inline;
+      position: relative;
+      top:-30px;
+      margin-left: 30px;
+    }
+    #header-content{
+      margin-top: 15px;
+      margin-left: 18px;
+    }
+    #heading{
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+    #logo{
+        display: inline;
+    }
+    #home-link{
+      text-decoration: none;
+    }
+    #logo path{
+      fill: orange;
+      }
+    #icon-name{
+      display:inline;
+      font-size: 30px;
+      font-family: Selawik, Century Gothic, Helvetica, verdana, sans-serif;
+      position: relative;
+      top:-10px;
+      left:-10px;
+      color: orange;
+      text-rendering: optimizeSpeed;
+      letter-spacing: -5px;
+    }
+    #header-section{
+      display: inline;
+      position: relative;
+      top: -45px;
+    }
+    .header-button{
+      position: relative;
+      float: right;
+      top: 25px;
+    }
+    .header-button> *{
+      display: inline;
+      padding: 10px;
+    }
+    #logo-section{
+      display: inline;
+    }
+    #sign-in{
+      height:25px;
+      border-radius: 3px;
+      text-decoration: none;
+      background-color: black;
+      color:white;
+      border: 0px;
+      border-width: thin;
+    }
+    #upload-button{
+      height:25px;
+      border-top-left-radius: 10px;
+     border-bottom-right-radius: 10px;
+     background-color: slategray;
+     border:slategray;
+     color:white;
+    }
+    #show-profile{
+      height:25px;
+      border-top-left-radius: 10px;
+     border-bottom-right-radius: 10px;
+     background-color: slategray;
+     border:slategray;
+     color:white;
+    }
+    #sign-up{
+      height:25px;
+      border-radius: 3px;
+    }
+    .no-decoration{
+      text-decoration: none;
+      color:white;
+    }
+    #side-nav{
+      height:110%;
+      position:fixed;
+      background-color: white;
+      width:250px;
+      top:-20px;
+      z-index: 300;
+      display: none;
+      padding-top: 20px;
+    }
+    .twerk-upload-button{
+      position: relative;
+      left:10%;
+    }
+    .twerk-logo-section{
+      position: relative;
+      left:12%;
+      top:-10px;
+    }
+    #close{
+      fill: orange;
+    }
+    #menu-link{
+      display: block;
+    }
+    #cancel-link{
+      display: block;
+    }

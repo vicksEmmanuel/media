@@ -1,0 +1,991 @@
+<div id="media-contents">
+    <ul class="listview">
+    </ul>
+    <script>
+            if (!('IntersectionObserver' in window)) document.body.classList.add('polyfill');
+                var pageSize = 3,
+                sentinel = {
+                    el: null,
+                    set: function(el) {
+                        this.el = el;
+                        this.el.classList.add('sentinel');
+                        sentinelObserver.observe(this.el);
+                    },
+                    unset: function() {
+                        if (!this.el)
+                            return;
+                        sentinelObserver.unobserve(this.el);
+                        this.el.classList.remove('sentinel');
+                        this.el = null;
+                    }
+                },
+                sentinelListener = function(entries) {
+                    sentinel.unset();
+                    listView.classList.add('loading');
+                    nextPage().then(() => {
+                        updateSentinel();
+                        listView.classList.remove('loading');
+                    });
+                },
+                updateSentinel = function() {
+                    sentinel.set(listView.children[listView.children.length - pageSize]);
+                },
+                nextPage = function() {
+                    return loadNextPage().then((items) => {
+                        listView.insertAdjacentHTML(
+                            'beforeend',
+                            items.map(function(item){
+                              if(item.type=="process"){
+                                return `
+                                    <li class="listview__item placeholder--${item.id}" type="${item.type}" placeholder="placeholder--${item.id}">
+                                        <div class="listview__item__content">
+                                            <p>${item.type}ing video</p>
+                                            <p>${item.file_name}</p>
+                                        </div>
+                                    </li>
+                                `;
+                              }
+                              else if(item.type=="playlist"){
+                                return `
+                                    <li class="listview__item placeholder--${item.id}" type="${item.type}" placeholder="placeholder--${item.id}">
+                                        <div class="listview__item__content">
+                                            <p>${item.type}</p>
+                                        </div>
+                                    </li>
+                                `;
+                              }else if(item.type=="audio"){
+                                return `
+                                    <li class="listview__item placeholder--${item.id}"  type="${item.type}" placeholder="placeholder--${item.id}"
+                                    user="${item.user_id}" album_name="${item.album_name}" audio_name="${item.audio_name}" it="${item.id}"
+                                    date_created="${item.date_created}" genres="${item.genres}" year_created="${item.year_created}" min="${Date.now()+Math.floor(Math.random() * 1000) + Math.floor(Math.random() * 1000) +1}"
+                                    audio_path="${item.audio_path}" peak_path="${item.pcm}" album_artwork_path="${item.album_artwork_path}" artist_name="${item.artist_name}">
+                                        <div class="listview__item__content audio_content_in_list" >
+                                              <div class="listview__item__content__left listview__item__content__left__${item.id}">
+                                                    <a href="<%=locals.data.username%>?listen=${item.audio_name}&dxzy=${item.ide}" class="listview__item__link listview__item__link__${item.id}">
+                                                        <div class="listview__item__image listview__item__image__${item.id}"
+                                                          style="background: url('${item.album_artwork_path}') no-repeat center; background-size: cover;">
+                                                          <button class="listview__own__play__pause" title="Play">
+                                                            <svg version="1.1" id="play_pause__button__cover__${item.id}" class="play_pause__button__cover" placeholder="play_pause__button__cover__${item.id}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                                                    viewBox="0 0 487.622 487.622" style="enable-background:new 0 0 487.622 487.622;" xml:space="preserve">
+                                                                    <g>
+                                                                    <g>
+                                                                    <circle style="fill:#3C556B;" cx="243.811" cy="243.811" r="243.811"/>
+                                                                    <path style="opacity:0.37;fill:#2D465C;enable-background:new    ;" d="M463.269,350.135L385.217,243.81l-228.67-83.98
+                                                                    l-3.145,47.647l68.068,109.309l-68.068,60.864l91.947,109.952C341.228,487.008,423.979,431.08,463.269,350.135z"/>
+                                                                    <polygon style="fill:#FFFFFF;" points="153.403,109.972 153.403,207.477 194.799,207.477 194.799,181.674 302.423,243.81
+                                                                    194.799,305.947 194.799,280.373 153.403,280.373 153.403,377.65 385.217,243.81 		"/>
+                                                                    </g>
+                                                                    </g>
+                                                                    <g>
+                                                                    </g>
+                                                                    <g>
+                                                                    </g>
+                                                                    <g>
+                                                                    </g>
+                                                                    <g>
+                                                                    </g>
+                                                                    <g>
+                                                                    </g>
+                                                                    <g>
+                                                                    </g>
+                                                                    <g>
+                                                                    </g>
+                                                                    <g>
+                                                                    </g>
+                                                                    <g>
+                                                                    </g>
+                                                                    <g>
+                                                                    </g>
+                                                                    <g>
+                                                                    </g>
+                                                                    <g>
+                                                                    </g>
+                                                                    <g>
+                                                                    </g>
+                                                                    <g>
+                                                                    </g>
+                                                                    <g>
+                                                                    </g>
+                                                                    </svg>
+                                                          </button>
+                                                          <button class="listview__own__play__pause_pause" title="Pause">
+                                                              <svg  id="play_pause_pause__button__cover__${item.id}" class="play_pause_pause__button__cover" placeholder="play_pause_pause__button__cover__${item.id}" version="1.1"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                                                  viewBox="0 0 58 58" style="enable-background:new 0 0 58 58;" xml:space="preserve">
+                                                                  <circle style="fill:#C7CAC7;" cx="29" cy="29" r="29"/>
+                                                                  <g>
+                                                                  <rect x="33" y="14" style="fill:#FFFFFF;" width="6" height="30"/>
+                                                                  <path style="fill:#FFFFFF;" d="M40,45h-8V13h8V45z M34,43h4V15h-4V43z"/>
+                                                                  </g>
+                                                                  <g>
+                                                                  <rect x="19" y="14" style="fill:#FFFFFF;" width="6" height="30"/>
+                                                                  <path style="fill:#FFFFFF;" d="M26,45h-8V13h8V45z M20,43h4V15h-4V43z"/>
+                                                                  </g>
+                                                                  <g>
+                                                                  </g>
+                                                                  <g>
+                                                                  </g>
+                                                                  <g>
+                                                                  </g>
+                                                                  <g>
+                                                                  </g>
+                                                                  <g>
+                                                                  </g>
+                                                                  <g>
+                                                                  </g>
+                                                                  <g>
+                                                                  </g>
+                                                                  <g>
+                                                                  </g>
+                                                                  <g>
+                                                                  </g>
+                                                                  <g>
+                                                                  </g>
+                                                                  <g>
+                                                                  </g>
+                                                                  <g>
+                                                                  </g>
+                                                                  <g>
+                                                                  </g>
+                                                                  <g>
+                                                                  </g>
+                                                                  <g>
+                                                                  </g>
+                                                                  </svg>
+                                                          </button>
+                                                          <div class="candy" width="10" height="10" id="can__${item.id}" placeholder="can__${item.id}"></div>
+                                                          <img width="5" height="5" class="fundy" id="fundy__${item.id}" placeholder="fundy__${item.id}" src=""/>
+                                                        </div>
+                                                    </a>
+                                              </div>
+                                              <div class="listview__item__content__right listview__item__content__right__${item.id}">
+                                                    <div class="listview__content__audio__header">
+                                                          <div class="listview__content__audio__header__body">
+                                                                <a href="javascript:void(0)" class="listview__content__audio__header__body_artwork"
+                                                                    data-toggle='popover' data-trigger="focus" data-placement="bottom" data-html="true" data-content='
+                                                                        <div class="listview__content__audio__header__body_artwork__pop">
+                                                                              <img class="order_cov" style="width:200px; height:200px;" src="${item.album_artwork_path}"/>
+                                                                              <div class="other_order">
+                                                                                    <div class="other_order_text"><a href="#">${item.album_name}</a></div>
+                                                                                    <div class="other_order_log">${item.artist_name}</div>
+                                                                                    <div class="other_order_follow_button">
+                                                                                          <button title="Follow">Follow</button>
+                                                                                    </div>
+                                                                              </div>
+                                                                        </div>
+                                                                     '>
+                                                                </a>
+                                                                <span class="listview__content__audio__header__body__title">
+                                                                    <div class="listview__content__audio__header__body__title__artist">
+                                                                      ${item.artist_name}
+                                                                    </div>
+                                                                    <div class="listview__content__audio__header__body__title__title">
+                                                                        ${item.audio_name}
+                                                                    </div>
+                                                                </span>
+                                                                <span class="listview__content__audio__header__body__genres">#${item.genres}</span>
+                                                          </div>
+                                                    </div>
+                                                    <div class="listview__content__audio__waveform">
+                                                          <div class="listview__content__audio__waveform__body">
+                                                                <div class="waveform" placeholder="waveform__${item.id}" id="waveform__${item.id}"></div>
+                                                                <span class="lyrics" placeholder="lyrics__${item.id}" id="lyrics__${item.id}">Lyrics Goes here<br/>Hell yea</span>
+                                                          </div>
+                                                    </div>
+                                                    <div class="reaction">
+                                                              <div class="listview__reaction">
+                                                                    <div class="listview__reaction__button">
+                                                                            <div class="listview__float__back">
+                                                                                  <button title="play" class="play_me_some">
+                                                                                      <svg version="1.1" class="play_me_some_play_button" id="play__me__some__button__cover__${item.id}" placeholder="play__me__some__button__cover__${item.id}"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                                                                             viewBox="0 0 41.999 41.999" style="enable-background:new 0 0 41.999 41.999;" xml:space="preserve">
+                                                                                          <path d="M36.068,20.176l-29-20C6.761-0.035,6.363-0.057,6.035,0.114C5.706,0.287,5.5,0.627,5.5,0.999v40
+                                                                                            c0,0.372,0.206,0.713,0.535,0.886c0.146,0.076,0.306,0.114,0.465,0.114c0.199,0,0.397-0.06,0.568-0.177l29-20
+                                                                                            c0.271-0.187,0.432-0.494,0.432-0.823S36.338,20.363,36.068,20.176z"/>
+                                                                                          <g>
+                                                                                          </g>
+                                                                                          <g>
+                                                                                          </g>
+                                                                                          <g>
+                                                                                          </g>
+                                                                                          <g>
+                                                                                          </g>
+                                                                                          <g>
+                                                                                          </g>
+                                                                                          <g>
+                                                                                          </g>
+                                                                                          <g>
+                                                                                          </g>
+                                                                                          <g>
+                                                                                          </g>
+                                                                                          <g>
+                                                                                          </g>
+                                                                                          <g>
+                                                                                          </g>
+                                                                                          <g>
+                                                                                          </g>
+                                                                                          <g>
+                                                                                          </g>
+                                                                                          <g>
+                                                                                          </g>
+                                                                                          <g>
+                                                                                          </g>
+                                                                                          <g>
+                                                                                          </g>
+                                                                                          </svg>
+                                                                                   </button>
+                                                                                   <button title="pause" class="pause_me_some">
+                                                                                       <svg version="1.1" class="pause_me_some_play_button" id="pause__me__some__button__cover__${item.id}" placeholder="pause__me__some__button__cover__${item.id}"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                                                                              viewBox="0 0 42 42" style="enable-background:new 0 0 42 42;" xml:space="preserve">
+                                                                                            <g>
+                                                                                             <path d="M14.5,0c-0.552,0-1,0.447-1,1v40c0,0.553,0.448,1,1,1s1-0.447,1-1V1C15.5,0.447,15.052,0,14.5,0z"/>
+                                                                                             <path d="M27.5,0c-0.552,0-1,0.447-1,1v40c0,0.553,0.448,1,1,1s1-0.447,1-1V1C28.5,0.447,28.052,0,27.5,0z"/>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                     </svg>
+                                                                                   </button>
+                                                                                  <div class="other_reaction_goes">
+                                                                                      <div class="give__her">
+                                                                                            <button class="dislike" placeholder="dislike__${item.id}" id="dislike__${item.id}" title="dislike">
+                                                                                                  <span class="dislike_stat" placeholder="dislike_stat_${item.id}"  id="dislike_stat_${item.id}">1,203</span>
+                                                                                                  <svg version="1.1" class="dislike__button" placeholder="dislike__button__${item.id}" id="dislike__button__${item.id}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                                                                                               viewBox="0 0 487.643 487.643" style="enable-background:new 0 0 487.643 487.643;" xml:space="preserve">
+                                                                                                            <g>
+                                                                                                              <path d="M113.869,209.443l46-200.1c0,0,71.2-9.3,142.6-7.8c28.5-2.3,58.9-2.5,83,2.7c81.9,17.4,61.4,74.5,61.4,74.5
+                                                                                                                c44.2,33.2,19,74.6,19,74.6c39.2,41,0.7,75.3,0.7,75.3s21.2,33-6.1,58c-34.2,31.2-126.9,10.5-126.9,10.5l0,0
+                                                                                                                c-6.4-1.1-13.3-2.5-20.7-4.2c0,0-32.1-15,0,82.4s-21.4,112.3-43.9,112.3s-15-48.1-15-48.1s-48.1-132.7-94.1-168
+                                                                                                                c-9.9-10.4-16.1-21.8-19.9-31.2l0,0l0,0c-0.9-2.3-1.7-4.5-2.4-6.5C134.469,227.543,127.869,217.843,113.869,209.443z
+                                                                                                                 M70.869,206.643c9.7,0,19.2-7.7,21.2-17.2l34.8-165.6c2-9.5-4.3-17.2-14-17.2H4.169l0.1,200H70.869z"/>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            </svg>
+                                                                                            </button>
+                                                                                            <button title="like" class="like" placeholder="like__${item.id}" id="like__${item.id}">
+                                                                                                  <span class="like_stat" placeholder="like_stat_${item.id}" id="like_stat_${item.id}">100,203</span>
+                                                                                                  <svg version="1.1" class="like__button" placeholder="like__button__${item.id}" id="like__button__${item.id}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                                                                                        viewBox="0 0 489.543 489.543" style="enable-background:new 0 0 489.543 489.543;" xml:space="preserve">
+                                                                                                        <g>
+                                                                                                        <g>
+                                                                                                        <path d="M270.024,0c-22.6,0-15,48.3-15,48.3s-48.3,133.2-94.5,168.7c-9.9,10.4-16.1,21.9-20,31.3l0,0l0,0
+                                                                                                          c-0.9,2.3-1.7,4.5-2.4,6.5c-3.1,6.3-9.7,16-23.8,24.5l46.2,200.9c0,0,71.5,9.3,143.2,7.8c28.7,2.3,59.1,2.5,83.3-2.7
+                                                                                                          c82.2-17.5,61.6-74.8,61.6-74.8c44.3-33.3,19.1-74.9,19.1-74.9c39.4-41.1,0.7-75.6,0.7-75.6s21.3-33.2-6.2-58.3
+                                                                                                          c-34.3-31.4-127.4-10.5-127.4-10.5l0,0c-6.5,1.1-13.4,2.5-20.8,4.3c0,0-32.2,15,0-82.7C346.324,15.1,292.624,0,270.024,0z"/>
+                                                                                                        <path d="M127.324,465.7l-35-166.3c-2-9.5-11.6-17.3-21.3-17.3h-66.8l-0.1,200.8h109.1C123.024,483,129.324,475.2,127.324,465.7z"
+                                                                                                          />
+                                                                                                        </g>
+                                                                                                        </g>
+                                                                                                        <g>
+                                                                                                        </g>
+                                                                                                        <g>
+                                                                                                        </g>
+                                                                                                        <g>
+                                                                                                        </g>
+                                                                                                        <g>
+                                                                                                        </g>
+                                                                                                        <g>
+                                                                                                        </g>
+                                                                                                        <g>
+                                                                                                        </g>
+                                                                                                        <g>
+                                                                                                        </g>
+                                                                                                        <g>
+                                                                                                        </g>
+                                                                                                        <g>
+                                                                                                        </g>
+                                                                                                        <g>
+                                                                                                        </g>
+                                                                                                        <g>
+                                                                                                        </g>
+                                                                                                        <g>
+                                                                                                        </g>
+                                                                                                        <g>
+                                                                                                        </g>
+                                                                                                        <g>
+                                                                                                        </g>
+                                                                                                        <g>
+                                                                                                        </g>
+                                                                                                        </svg>
+                                                                                            </button>
+                                                                                            <button title="share" class="share" placeholder="share__${item.id}" id="share__${item.id}">
+                                                                                                  <span class="share_stat" placeholder="share_stat_${item.id}" id="share_stat_${item.id}">20</span>
+                                                                                                  <svg version="1.1" class="share__button" placeholder="share__button__${item.id}" id="share__button__${item.id}"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                                                                                             width="475.082px" height="475.081px" viewBox="0 0 475.082 475.081" style="enable-background:new 0 0 475.082 475.081;"
+                                                                                                             xml:space="preserve">
+                                                                                                          <g>
+                                                                                                            <g>
+                                                                                                              <path d="M469.658,133.333L360.029,23.697c-3.621-3.617-7.909-5.424-12.854-5.424c-2.275,0-4.661,0.476-7.132,1.425
+                                                                                                                c-7.426,3.237-11.139,8.852-11.139,16.846v54.821h-45.683c-20.174,0-38.879,1.047-56.101,3.14
+                                                                                                                c-17.224,2.092-32.404,4.993-45.537,8.708c-13.134,3.708-24.983,8.326-35.547,13.846c-10.562,5.518-19.555,11.372-26.98,17.559
+                                                                                                                c-7.426,6.186-13.943,13.23-19.558,21.129c-5.618,7.898-10.088,15.653-13.422,23.267c-3.328,7.616-5.992,15.99-7.992,25.125
+                                                                                                                c-2.002,9.137-3.333,17.701-3.999,25.693c-0.666,7.994-0.999,16.657-0.999,25.979c0,10.663,1.668,22.271,4.998,34.838
+                                                                                                                c3.331,12.559,6.995,23.407,10.992,32.545c3.996,9.13,8.709,18.603,14.134,28.403c5.424,9.802,9.182,16.317,11.276,19.555
+                                                                                                                c2.093,3.23,4.095,6.187,5.997,8.85c1.903,2.474,4.377,3.71,7.421,3.71c0.765,0,1.902-0.186,3.427-0.568
+                                                                                                                c4.377-2.095,6.279-5.325,5.708-9.705c-8.564-63.954-1.52-108.973,21.128-135.047c21.892-24.934,63.575-37.403,125.051-37.403
+                                                                                                                h45.686v54.816c0,8.001,3.71,13.613,11.136,16.851c2.471,0.951,4.853,1.424,7.132,1.424c5.14,0,9.425-1.807,12.854-5.421
+                                                                                                                l109.633-109.637c3.613-3.619,5.424-7.898,5.424-12.847C475.082,141.23,473.271,136.944,469.658,133.333z"/>
+                                                                                                              <path d="M395.996,292.356c-3.625-1.529-6.951-0.763-9.993,2.283c-4.948,4.568-10.092,8.093-15.42,10.564
+                                                                                                                c-3.433,1.902-5.141,4.66-5.141,8.277v61.104c0,12.562-4.466,23.308-13.415,32.26c-8.945,8.946-19.704,13.419-32.264,13.419
+                                                                                                                H82.222c-12.564,0-23.318-4.473-32.264-13.419c-8.947-8.952-13.418-19.697-13.418-32.26V137.039
+                                                                                                                c0-12.563,4.471-23.313,13.418-32.259c8.945-8.947,19.699-13.418,32.264-13.418h31.977c1.141,0,2.666-0.383,4.568-1.143
+                                                                                                                c10.66-6.473,23.313-12.185,37.972-17.133c4.949-0.95,7.423-3.994,7.423-9.136c0-2.474-0.903-4.611-2.712-6.423
+                                                                                                                c-1.809-1.804-3.946-2.708-6.423-2.708H82.226c-22.65,0-42.018,8.042-58.102,24.125C8.042,95.026,0,114.394,0,137.044v237.537
+                                                                                                                c0,22.651,8.042,42.018,24.125,58.102c16.084,16.084,35.452,24.126,58.102,24.126h237.541c22.647,0,42.017-8.042,58.101-24.126
+                                                                                                                c16.085-16.084,24.127-35.45,24.127-58.102v-73.946C401.995,296.829,399.996,294.071,395.996,292.356z"/>
+                                                                                                            </g>
+                                                                                                          </g>
+                                                                                                          <g>
+                                                                                                          </g>
+                                                                                                          <g>
+                                                                                                          </g>
+                                                                                                          <g>
+                                                                                                          </g>
+                                                                                                          <g>
+                                                                                                          </g>
+                                                                                                          <g>
+                                                                                                          </g>
+                                                                                                          <g>
+                                                                                                          </g>
+                                                                                                          <g>
+                                                                                                          </g>
+                                                                                                          <g>
+                                                                                                          </g>
+                                                                                                          <g>
+                                                                                                          </g>
+                                                                                                          <g>
+                                                                                                          </g>
+                                                                                                          <g>
+                                                                                                          </g>
+                                                                                                          <g>
+                                                                                                          </g>
+                                                                                                          <g>
+                                                                                                          </g>
+                                                                                                          <g>
+                                                                                                          </g>
+                                                                                                          <g>
+                                                                                                          </g>
+                                                                                                          </svg>
+                                                                                            </button>
+                                                                                            <button title="menu" class="menue" placeholder="menue__${item.id}" id="menue__${item.id}">
+                                                                                                  <a href="javascript:void(0)" class="menu__button" placeholder="menu__button__${item.id}" id="menu__button__${item.id}"
+                                                                                                        data-toggle='popover' data-trigger="focus" data-placement="top" data-html="true" data-content='
+                                                                                                            Menu List Goes Here
+                                                                                                         '>
+                                                                                                        <div class="take-on"></div>
+                                                                                                        <div class="take-on"></div>
+                                                                                                        <div class="take-on"></div>
+                                                                                                  </a>
+                                                                                            </button>
+                                                                                      </div>
+                                                                                  </div>
+                                                                            </div>
+                                                                            <div class="listview__save__div">
+                                                                                  <div class="listview_view_stat">
+                                                                                      1,283,394,993 views
+                                                                                  </div>
+                                                                                  <button title="Save Offline" class="save__offline">
+                                                                                      <svg version="1.1"  class="down_save"  placeholder="down_save_${item.id}"  id="down_save_${item.id}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                                                                            width="433.5px" height="433.5px" viewBox="0 0 433.5 433.5" style="enable-background:new 0 0 433.5 433.5;" xml:space="preserve"
+                                                                                            >
+                                                                                            <g>
+                                                                                            <g id="file-download">
+                                                                                            <path d="M395.25,153h-102V0h-153v153h-102l178.5,178.5L395.25,153z M38.25,382.5v51h357v-51H38.25z"/>
+                                                                                            </g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            <g>
+                                                                                            </g>
+                                                                                            </svg>
+                                                                                  </button>
+                                                                            </div>
+                                                                    </div>
+                                                                    <div class="listview__comment">
+                                                                          <img class="listview__img" placeholder="listview__img__${item.id}" id="listview__img__${item.id}"/>
+                                                                          <input type="text" class="listview__text" placeholder="Write Comment ..." text_me="lisview_text__${item.id}" id="lisview_text__${item.id}"/>
+                                                                          <span class="listview_date">1 month</span>
+                                                                    </div>
+                                                              </div>
+                                                    </div>
+                                              </div>
+                                        </div>
+                                    </li>
+                                `;
+                              }else if(item.type=="video"){
+                                return `
+                                <li class="listview__item placeholder--${item.id}"  type="${item.type}" placeholder="placeholder--${item.id}"
+                                  user="${item.user_id}" category="${item.category}" video_title="${item.video_title}"
+                                  date_created="${item.date_created}" playlist_id="${item.playlist_id}" thubnail_path="${item.thubnail_path}" min="${item.id}"
+                                  description="${item.video_description}" video_path="${item.video_path}" privacy="${item.video_privacy}">
+                                      <div class="listview__item__content video_content_in_list" >
+                                            <div class="listview__video__item__content__left listview__video__item__content__left__${item.id}">
+                                                  <div class="video__butt__thumb video__butt__thumb__${item.id}">
+                                                        <span class="video_ad video_ad_${item.id}">
+                                                              <svg version="1.1" class="custom_playeeer custom_playeeer_${item.id}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" xmlns:xlink="http://www.w3.org/1999/xlink" enable-background="new 0 0 28 28">
+                                                                <path d="M8.2,3.1c4.8,2,11.6,6.3,14.9,8.8c0.4,0.3,0.7,1,0.6,1.6c-0.2,0.8-0.9,1.6-1.4,1.9C20,17,16.4,19.3,13,20.9  c-4.9,2.3-9.5,2.7-9.8-0.1C3.1,19,3,16.7,3,13.9c0-4,0.2-7,0.4-9C3.5,4.3,4.1,3.5,5,3.1C6.1,2.8,7.5,2.8,8.2,3.1z M4.3,0  C3.6,0,2.6,0.5,2.1,1.3C1.9,1.7,1,6,1,14s0.8,12.3,1.1,12.7C2.6,27.5,3.7,28,4.3,28c5.3,0,21-10.2,22.4-12.7  c0.2-0.4,0.3-0.9,0.3-1.3s-0.1-0.9-0.3-1.3C25.3,10.2,9.6,0,4.3,0L4.3,0z"/>
+                                                                </svg>
+                                                              <span class="duration_video duration_video_${item.id}">12:30</span>
+                                                        </span>
+                                                  </div>
+                                            </div>
+                                            <div class="listview__video__item__content__right listview__video__item__content__right__${item.id}">
+                                                  <div class="midform midform_${item.id}">
+                                                        <div class="video_in__listview__title video_in__listview__title_${item.id}">
+                                                            <div class="title_body title_body_${item.id}">
+                                                              <button class="video__play__button video__play__button_${item.id}" title="play">
+                                                                        <svg version="1.1" class="video__play__butt video__play__butt_${item.id}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                                                        viewBox="0 0 502.029 502.029" style="enable-background:new 0 0 502.029 502.029;" xml:space="preserve">
+                                                                        <g>
+                                                                        <g>
+                                                                        <path  d="M310.78,203.203l107.578,23.905L63.948,502.029l127.3-215.154L83.67,262.969L438.081,0
+                                                                          L310.78,203.203z"/>
+                                                                        </g>
+                                                                      </g>
+                                                                      <g>
+                                                                      </g>
+                                                                      <g>
+                                                                      </g>
+                                                                      <g>
+                                                                      </g>
+                                                                      <g>
+                                                                      </g>
+                                                                      <g>
+                                                                      </g>
+                                                                      <g>
+                                                                      </g>
+                                                                      <g>
+                                                                      </g>
+                                                                      <g>
+                                                                      </g>
+                                                                      <g>
+                                                                      </g>
+                                                                      <g>
+                                                                      </g>
+                                                                      <g>
+                                                                      </g>
+                                                                      <g>
+                                                                      </g>
+                                                                      <g>
+                                                                      </g>
+                                                                      <g>
+                                                                      </g>
+                                                                      <g>
+                                                                      </g>
+                                                                      </svg>
+                                                                  </button>
+                                                              <div class="video_own__title video_own__title_${item.id}">
+                                                                  <a href="" class="video_own_link">${item.video_title}</a>
+                                                              </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="video__in__listview__body video__in__listview__body__${item.id}">
+                                                            ${item.video_description}
+                                                        </div>
+                                                        <div class="video__in__listview__reaction">
+                                                                  <div class="listview__reaction">
+                                                                        <div class="listview__reaction__button">
+                                                                                <div class="listview__float__back">
+                                                                                      <button title="play" class="play_me_some">
+                                                                                          <svg version="1.1" class="play_me_some_play_button" id="play__me__some__button__cover__${item.id}" placeholder="play__me__some__button__cover__${item.id}"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                                                                                 viewBox="0 0 41.999 41.999" style="enable-background:new 0 0 41.999 41.999;" xml:space="preserve">
+                                                                                              <path d="M36.068,20.176l-29-20C6.761-0.035,6.363-0.057,6.035,0.114C5.706,0.287,5.5,0.627,5.5,0.999v40
+                                                                                                c0,0.372,0.206,0.713,0.535,0.886c0.146,0.076,0.306,0.114,0.465,0.114c0.199,0,0.397-0.06,0.568-0.177l29-20
+                                                                                                c0.271-0.187,0.432-0.494,0.432-0.823S36.338,20.363,36.068,20.176z"/>
+                                                                                              <g>
+                                                                                              </g>
+                                                                                              <g>
+                                                                                              </g>
+                                                                                              <g>
+                                                                                              </g>
+                                                                                              <g>
+                                                                                              </g>
+                                                                                              <g>
+                                                                                              </g>
+                                                                                              <g>
+                                                                                              </g>
+                                                                                              <g>
+                                                                                              </g>
+                                                                                              <g>
+                                                                                              </g>
+                                                                                              <g>
+                                                                                              </g>
+                                                                                              <g>
+                                                                                              </g>
+                                                                                              <g>
+                                                                                              </g>
+                                                                                              <g>
+                                                                                              </g>
+                                                                                              <g>
+                                                                                              </g>
+                                                                                              <g>
+                                                                                              </g>
+                                                                                              <g>
+                                                                                              </g>
+                                                                                              </svg>
+                                                                                       </button>
+                                                                                       <button title="pause" class="pause_me_some">
+                                                                                           <svg version="1.1" class="pause_me_some_play_button" id="pause__me__some__button__cover__${item.id}" placeholder="pause__me__some__button__cover__${item.id}"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                                                                                  viewBox="0 0 42 42" style="enable-background:new 0 0 42 42;" xml:space="preserve">
+                                                                                                <g>
+                                                                                                 <path d="M14.5,0c-0.552,0-1,0.447-1,1v40c0,0.553,0.448,1,1,1s1-0.447,1-1V1C15.5,0.447,15.052,0,14.5,0z"/>
+                                                                                                 <path d="M27.5,0c-0.552,0-1,0.447-1,1v40c0,0.553,0.448,1,1,1s1-0.447,1-1V1C28.5,0.447,28.052,0,27.5,0z"/>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                         </svg>
+                                                                                       </button>
+                                                                                      <div class="other_reaction_goes">
+                                                                                          <div class="give__her">
+                                                                                                <button class="dislike" placeholder="dislike__${item.id}" id="dislike__${item.id}" title="dislike">
+                                                                                                      <span class="dislike_stat" placeholder="dislike_stat_${item.id}"  id="dislike_stat_${item.id}">1,203</span>
+                                                                                                      <svg version="1.1" class="dislike__button" placeholder="dislike__button__${item.id}" id="dislike__button__${item.id}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                                                                                                   viewBox="0 0 487.643 487.643" style="enable-background:new 0 0 487.643 487.643;" xml:space="preserve">
+                                                                                                                <g>
+                                                                                                                  <path d="M113.869,209.443l46-200.1c0,0,71.2-9.3,142.6-7.8c28.5-2.3,58.9-2.5,83,2.7c81.9,17.4,61.4,74.5,61.4,74.5
+                                                                                                                    c44.2,33.2,19,74.6,19,74.6c39.2,41,0.7,75.3,0.7,75.3s21.2,33-6.1,58c-34.2,31.2-126.9,10.5-126.9,10.5l0,0
+                                                                                                                    c-6.4-1.1-13.3-2.5-20.7-4.2c0,0-32.1-15,0,82.4s-21.4,112.3-43.9,112.3s-15-48.1-15-48.1s-48.1-132.7-94.1-168
+                                                                                                                    c-9.9-10.4-16.1-21.8-19.9-31.2l0,0l0,0c-0.9-2.3-1.7-4.5-2.4-6.5C134.469,227.543,127.869,217.843,113.869,209.443z
+                                                                                                                     M70.869,206.643c9.7,0,19.2-7.7,21.2-17.2l34.8-165.6c2-9.5-4.3-17.2-14-17.2H4.169l0.1,200H70.869z"/>
+                                                                                                                </g>
+                                                                                                                <g>
+                                                                                                                </g>
+                                                                                                                <g>
+                                                                                                                </g>
+                                                                                                                <g>
+                                                                                                                </g>
+                                                                                                                <g>
+                                                                                                                </g>
+                                                                                                                <g>
+                                                                                                                </g>
+                                                                                                                <g>
+                                                                                                                </g>
+                                                                                                                <g>
+                                                                                                                </g>
+                                                                                                                <g>
+                                                                                                                </g>
+                                                                                                                <g>
+                                                                                                                </g>
+                                                                                                                <g>
+                                                                                                                </g>
+                                                                                                                <g>
+                                                                                                                </g>
+                                                                                                                <g>
+                                                                                                                </g>
+                                                                                                                <g>
+                                                                                                                </g>
+                                                                                                                <g>
+                                                                                                                </g>
+                                                                                                                <g>
+                                                                                                                </g>
+                                                                                                                </svg>
+                                                                                                </button>
+                                                                                                <button title="like" class="like" placeholder="like__${item.id}" id="like__${item.id}">
+                                                                                                      <span class="like_stat" placeholder="like_stat_${item.id}" id="like_stat_${item.id}">100,203</span>
+                                                                                                      <svg version="1.1" class="like__button" placeholder="like__button__${item.id}" id="like__button__${item.id}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                                                                                            viewBox="0 0 489.543 489.543" style="enable-background:new 0 0 489.543 489.543;" xml:space="preserve">
+                                                                                                            <g>
+                                                                                                            <g>
+                                                                                                            <path d="M270.024,0c-22.6,0-15,48.3-15,48.3s-48.3,133.2-94.5,168.7c-9.9,10.4-16.1,21.9-20,31.3l0,0l0,0
+                                                                                                              c-0.9,2.3-1.7,4.5-2.4,6.5c-3.1,6.3-9.7,16-23.8,24.5l46.2,200.9c0,0,71.5,9.3,143.2,7.8c28.7,2.3,59.1,2.5,83.3-2.7
+                                                                                                              c82.2-17.5,61.6-74.8,61.6-74.8c44.3-33.3,19.1-74.9,19.1-74.9c39.4-41.1,0.7-75.6,0.7-75.6s21.3-33.2-6.2-58.3
+                                                                                                              c-34.3-31.4-127.4-10.5-127.4-10.5l0,0c-6.5,1.1-13.4,2.5-20.8,4.3c0,0-32.2,15,0-82.7C346.324,15.1,292.624,0,270.024,0z"/>
+                                                                                                            <path d="M127.324,465.7l-35-166.3c-2-9.5-11.6-17.3-21.3-17.3h-66.8l-0.1,200.8h109.1C123.024,483,129.324,475.2,127.324,465.7z"
+                                                                                                              />
+                                                                                                            </g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            <g>
+                                                                                                            </g>
+                                                                                                            </svg>
+                                                                                                </button>
+                                                                                                <button title="share" class="share" placeholder="share__${item.id}" id="share__${item.id}">
+                                                                                                      <span class="share_stat" placeholder="share_stat_${item.id}" id="share_stat_${item.id}">20</span>
+                                                                                                      <svg version="1.1" class="share__button" placeholder="share__button__${item.id}" id="share__button__${item.id}"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                                                                                                 width="475.082px" height="475.081px" viewBox="0 0 475.082 475.081" style="enable-background:new 0 0 475.082 475.081;"
+                                                                                                                 xml:space="preserve">
+                                                                                                              <g>
+                                                                                                                <g>
+                                                                                                                  <path d="M469.658,133.333L360.029,23.697c-3.621-3.617-7.909-5.424-12.854-5.424c-2.275,0-4.661,0.476-7.132,1.425
+                                                                                                                    c-7.426,3.237-11.139,8.852-11.139,16.846v54.821h-45.683c-20.174,0-38.879,1.047-56.101,3.14
+                                                                                                                    c-17.224,2.092-32.404,4.993-45.537,8.708c-13.134,3.708-24.983,8.326-35.547,13.846c-10.562,5.518-19.555,11.372-26.98,17.559
+                                                                                                                    c-7.426,6.186-13.943,13.23-19.558,21.129c-5.618,7.898-10.088,15.653-13.422,23.267c-3.328,7.616-5.992,15.99-7.992,25.125
+                                                                                                                    c-2.002,9.137-3.333,17.701-3.999,25.693c-0.666,7.994-0.999,16.657-0.999,25.979c0,10.663,1.668,22.271,4.998,34.838
+                                                                                                                    c3.331,12.559,6.995,23.407,10.992,32.545c3.996,9.13,8.709,18.603,14.134,28.403c5.424,9.802,9.182,16.317,11.276,19.555
+                                                                                                                    c2.093,3.23,4.095,6.187,5.997,8.85c1.903,2.474,4.377,3.71,7.421,3.71c0.765,0,1.902-0.186,3.427-0.568
+                                                                                                                    c4.377-2.095,6.279-5.325,5.708-9.705c-8.564-63.954-1.52-108.973,21.128-135.047c21.892-24.934,63.575-37.403,125.051-37.403
+                                                                                                                    h45.686v54.816c0,8.001,3.71,13.613,11.136,16.851c2.471,0.951,4.853,1.424,7.132,1.424c5.14,0,9.425-1.807,12.854-5.421
+                                                                                                                    l109.633-109.637c3.613-3.619,5.424-7.898,5.424-12.847C475.082,141.23,473.271,136.944,469.658,133.333z"/>
+                                                                                                                  <path d="M395.996,292.356c-3.625-1.529-6.951-0.763-9.993,2.283c-4.948,4.568-10.092,8.093-15.42,10.564
+                                                                                                                    c-3.433,1.902-5.141,4.66-5.141,8.277v61.104c0,12.562-4.466,23.308-13.415,32.26c-8.945,8.946-19.704,13.419-32.264,13.419
+                                                                                                                    H82.222c-12.564,0-23.318-4.473-32.264-13.419c-8.947-8.952-13.418-19.697-13.418-32.26V137.039
+                                                                                                                    c0-12.563,4.471-23.313,13.418-32.259c8.945-8.947,19.699-13.418,32.264-13.418h31.977c1.141,0,2.666-0.383,4.568-1.143
+                                                                                                                    c10.66-6.473,23.313-12.185,37.972-17.133c4.949-0.95,7.423-3.994,7.423-9.136c0-2.474-0.903-4.611-2.712-6.423
+                                                                                                                    c-1.809-1.804-3.946-2.708-6.423-2.708H82.226c-22.65,0-42.018,8.042-58.102,24.125C8.042,95.026,0,114.394,0,137.044v237.537
+                                                                                                                    c0,22.651,8.042,42.018,24.125,58.102c16.084,16.084,35.452,24.126,58.102,24.126h237.541c22.647,0,42.017-8.042,58.101-24.126
+                                                                                                                    c16.085-16.084,24.127-35.45,24.127-58.102v-73.946C401.995,296.829,399.996,294.071,395.996,292.356z"/>
+                                                                                                                </g>
+                                                                                                              </g>
+                                                                                                              <g>
+                                                                                                              </g>
+                                                                                                              <g>
+                                                                                                              </g>
+                                                                                                              <g>
+                                                                                                              </g>
+                                                                                                              <g>
+                                                                                                              </g>
+                                                                                                              <g>
+                                                                                                              </g>
+                                                                                                              <g>
+                                                                                                              </g>
+                                                                                                              <g>
+                                                                                                              </g>
+                                                                                                              <g>
+                                                                                                              </g>
+                                                                                                              <g>
+                                                                                                              </g>
+                                                                                                              <g>
+                                                                                                              </g>
+                                                                                                              <g>
+                                                                                                              </g>
+                                                                                                              <g>
+                                                                                                              </g>
+                                                                                                              <g>
+                                                                                                              </g>
+                                                                                                              <g>
+                                                                                                              </g>
+                                                                                                              <g>
+                                                                                                              </g>
+                                                                                                              </svg>
+                                                                                                </button>
+                                                                                                <button title="menu" class="menue" placeholder="menue__${item.id}" id="menue__${item.id}">
+                                                                                                      <a href="javascript:void(0)" class="menu__button" placeholder="menu__button__${item.id}" id="menu__button__${item.id}"
+                                                                                                            data-toggle='popover' data-trigger="focus" data-placement="top" data-html="true" data-content='
+                                                                                                                Menu List Goes Here
+                                                                                                             '>
+                                                                                                            <div class="take-on"></div>
+                                                                                                            <div class="take-on"></div>
+                                                                                                            <div class="take-on"></div>
+                                                                                                      </a>
+                                                                                                </button>
+                                                                                          </div>
+                                                                                      </div>
+                                                                                </div>
+                                                                                <div class="listview__save__div">
+                                                                                      <div class="listview_view_stat">
+                                                                                          1,283,394,993 views
+                                                                                      </div>
+                                                                                      <button title="Save Offline" class="save__offline">
+                                                                                          <svg version="1.1"  class="down_save"  placeholder="down_save_${item.id}"  id="down_save_${item.id}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                                                                                width="433.5px" height="433.5px" viewBox="0 0 433.5 433.5" style="enable-background:new 0 0 433.5 433.5;" xml:space="preserve"
+                                                                                                >
+                                                                                                <g>
+                                                                                                <g id="file-download">
+                                                                                                <path d="M395.25,153h-102V0h-153v153h-102l178.5,178.5L395.25,153z M38.25,382.5v51h357v-51H38.25z"/>
+                                                                                                </g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                <g>
+                                                                                                </g>
+                                                                                                </svg>
+                                                                                      </button>
+                                                                                </div>
+                                                                        </div>
+                                                                        <div class="listview__comment">
+                                                                              <img class="listview__img" placeholder="listview__img__${item.id}" id="listview__img__${item.id}" src="<%=locals.data.edit%>"/>
+                                                                              <input type="text" class="listview__text" placeholder="Write Comment ..." text_me="lisview_text__${item.id}" id="lisview_text__${item.id}"/>
+                                                                              <span class="listview_date">1 month</span>
+                                                                        </div>
+                                                        </div>
+                                                        </div>
+                                                  </div>
+                                            </div>
+                                      </div>
+                                  </li>
+                                `;
+                              }else if(item.type=="album"){
+                                return `
+                                    <li class="listview__item placeholder--${item.id}" type="${item.type}" placeholder="placeholder--${item.id}">
+                                        <span class="listview__item__id">${item.id}</span>
+                                        <div class="listview__item__content">
+                                            <p>${item.type}</p>
+                                        </div>
+                                    </li>
+                                `;
+                              }
+                            }).join('')
+                        );
+
+                    });
+                  },
+                loadNextPage = (function() {
+                    var pageNumber = 0;
+                    return function () {
+                        return new Promise(function(resolve, reject) {
+                            $.ajax({
+                              async: true,
+                              type:'GET',
+                              url: '/all-link?user=<%=locals.data.id%>',
+                              success:function(data){
+                                  if(data.length>0){
+                                    var items = [];
+                                    for (var id = pageNumber*pageSize, lastId = id + pageSize - 1; id <= lastId; ++id) {
+                                        if(id<data.length){
+                                              $("#js-loading").show();
+                                              if(data[id].type=="process"){
+                                                items.push({
+                                                  id: id,
+                                                  type: data[id].type,
+                                                  file_name: data[id].file_name
+                                                });
+                                              }
+                                              else if(data[id].type=="audio"){
+                                                items.push({
+                                                    id: id,
+                                                    artist_name:data[id].artist_name,
+                                                    album_artwork_path : data[id].album_artwork_path,
+                                                    album_name: data[id].album_name,
+                                                    audio_name: data[id].audio_name,
+                                                    audio_path: data[id].audio_path,
+                                                    pcm: data[id].pcm,
+                                                    date_created: data[id].date_created,
+                                                    genres: data[id].genres,
+                                                    description: data[id].description,
+                                                    privacy: data[id].privacy,
+                                                    type: data[id].type,
+                                                    year_created: data[id].year_created,
+                                                    user_id: data[id].user_id,
+                                                    ide: data[id].id,
+                                                    album_own_artwork: data[id].album_own_artwork
+                                                })
+                                              }else if(data[id].type=="video"){
+                                                items.push({
+                                                    id: id,
+                                                    category: data[id].category,
+                                                    date_created: data[id].date_created,
+                                                    playlist_id: data[id].playlist_id,
+                                                    thubnail_path: data[id].thubnail_path,
+                                                    type: data[id].type,
+                                                    video_description: data[id].video_description,
+                                                    video_path: data[id].video_path,
+                                                    video_privacy: data[id].video_privacy,
+                                                    video_title: data[id].video_title,
+                                                    user_id: data[id].user_id,
+                                                    ide: data[id].id
+                                                })
+                                              }else if(data[id].type=="playlist"){
+                                                items.push({
+                                                  id: id,
+                                                  ide: data[id].id,
+                                                  playlist_name: data[id].playlist_name,
+                                                  privacy: data[id].privacy,
+                                                  type: data[id].type,
+                                                  user_id: data[id].user_id,
+                                                  date_created: data[id].date_created
+                                                })
+                                              }else if(data[id].type=="album"){
+                                                items.push({
+                                                  id: id,
+                                                  album_artwork_path: data[id].album_artwork_path,
+                                                  album_name: data[id].album_name,
+                                                  album_path: data[id].album_path,
+                                                  artist_name: data[id].artist_name,
+                                                  description: data[id].description,
+                                                  genres: data[id].trap,
+                                                  ide: data[id].id,
+                                                  privacy: data[id].privacy,
+                                                  type: data[id].type,
+                                                  user_id: data[id].user_id
+                                                })
+                                              }
+                                        }else{
+                                          $("#js-loading").hide();
+                                        }
+                                    }
+                                    pageNumber++;
+                                    setTimeout(function() { resolve(items); }, getRandomInRange(500, 4000));
+                                  }else{
+                                          $("#js-loading").hide();
+                                  }
+                                }
+                            });
+                        });
+                    }
+                })(),
+                getRandomInRange = function(min, max) {
+                    return Math.floor(Math.random() * (max - min + 1)) + min;
+                },
+                listView = document.querySelector('.listview'),
+                sentinelObserver = new IntersectionObserver(sentinelListener, {threshold: 1}) ;
+                nextPage().then(() => {
+                    nextPage().then(updateSentinel);
+                });
+    </script>
+</div>
+<div id="js-loading">
+      <img src="header/images/loader.svg"  alt="loading" id="loading-image" width="100" height="100"/>
+</div>
+<div id="cone"></div>
