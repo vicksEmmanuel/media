@@ -9,13 +9,13 @@ using ShakaPlayer API to produce a HLS and Manifest Files to Produce video on de
 
 Also, the demonstration of PWA was achieved.
 
-##Set Up
+### Set Up
 
-1. Download and Install XAMPP application from this link [XAMPP!](https://www.apachefriends.org/download.html)
+1. Download and Install XAMPP application from this link [XAMPP](https://www.apachefriends.org/download.html)
 2. Import the sql files into your XAMPP
-	- [SQL File !](https://raw.githubusercontent.com/vicksEmmanuel/media/master/geopictures.sql)
-	- [SQL File !] (https://raw.githubusercontent.com/vicksEmmanuel/media/master/app.sql)
-3. Make sure you have Node.Js Installed. If you don't you can download from the link [Download Node JS!] (https://nodejs.org/en/download/)
+	- [SQL File](https://raw.githubusercontent.com/vicksEmmanuel/media/master/geopictures.sql)
+	- [SQL File](https://raw.githubusercontent.com/vicksEmmanuel/media/master/app.sql)
+3. Make sure you have Node.Js Installed. If you don't you can download from the link [Download Node JS](https://nodejs.org/en/download/)
 4. Now, that your nodejs is installed enter the command
 	```
 		npm install
@@ -24,5 +24,5 @@ Also, the demonstration of PWA was achieved.
 	```
 		node index.js
 	```
-6. Go to your browser and enter the link [localhost:3030!] (http://localhost:3030/)
+6. Go to your browser and enter the link [localhost:3030](http://localhost:3030/)
 7. Understand, Enjoy and Learn
